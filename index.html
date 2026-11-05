@@ -1,5 +1,15 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ondas Wi-Fi</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#d9d3c5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ondas Wi-Fi">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
@@ -88,6 +98,7 @@ button{cursor:pointer}
 .rail button:hover:not([aria-selected="true"]){background:var(--ctl)}
 .rail .lbl{position:absolute;left:58px;white-space:nowrap;padding:4px 10px;border-radius:10px;background:var(--glass-2);border:1px solid var(--glass-line);font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .15s;color:var(--fg)}
 .rail button:hover .lbl{opacity:1}
+.rail .lbs{display:none}
 .main{padding-left:84px;max-width:1560px;margin:0 auto}
 
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin-bottom:16px}
@@ -255,6 +266,7 @@ svg.rk{display:block;margin:0 auto;font-family:var(--font-ui);user-select:none;-
 details.cu summary{cursor:pointer;font-weight:700;font-size:13px}
 @media (max-width:1180px){.rk-wrap{grid-template-columns:280px minmax(0,1fr)}.rk-wrap>.rk-col:last-child{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}}
 @media (max-width:860px){.rk-wrap{grid-template-columns:minmax(0,1fr)}.rk-list{max-height:40vh}}
+
 @media (prefers-reduced-motion:reduce){.pulse{animation:none}.ring .vl{transition:none}}
 
 @media (max-width:1060px){
@@ -272,14 +284,91 @@ details.cu summary{cursor:pointer;font-weight:700;font-size:13px}
   .tb span{display:none}
   .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+/* ===== modo app (celular) ===== */
+html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+button,.tb,.rail button,.seg button,.rk-item{-webkit-tap-highlight-color:transparent}
+@media (max-width:760px){
+  body{padding-block:calc(8px + env(safe-area-inset-top,0px)) 0;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));font-size:13.5px}
+  .main{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  /* barra superior compacta */
+  .top{flex-wrap:nowrap;align-items:center;gap:8px;margin-bottom:10px}
+  .hello{flex:1;min-width:0}.hello small{display:none}
+  input.proj[type="text"]{font-size:20px;width:100%}
+  .chips{flex:none;flex-wrap:nowrap;gap:6px}
+  #exChip{display:none}
+  .pill{height:40px;padding:0 12px}
+  #btnNew:not(.arm) #btnNewTxt{display:none}
+  #btnNew.arm{position:absolute;right:10px;top:calc(8px + env(safe-area-inset-top,0px));z-index:40;background:var(--bad);color:#fff;border-color:transparent}
+  .top{position:relative}
+  /* abas fixas embaixo */
+  .rail{left:0;right:0;bottom:0;transform:none;top:auto;width:auto;justify-content:space-around;gap:0;padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px));border-radius:22px 22px 0 0;border-width:1px 0 0}
+  .rail button{flex:1;width:auto;height:52px;border-radius:16px;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center}
+  .rail button svg{width:22px;height:22px}
+  .rail .lbl{display:none}
+  .rail .lbs{display:block;font-size:10.5px;font-weight:700;color:inherit;line-height:1.1}
+  .rail button[aria-selected="true"]{background:var(--accent)}
+  /* cabeçalhos de seção */
+  .view-head{margin:0 0 10px;gap:8px}
+  .view-head h2{font-size:19px}
+  .view-head p{display:none}
+  .note{font-size:11.5px}
+  /* cartões e controles */
+  .card{padding:13px 14px;border-radius:20px}
+  .card h3{margin-bottom:9px}
+  .btn{height:44px;border-radius:14px}
+  .btn.mini{height:36px;min-width:36px}
+  input[type="text"],input[type="number"],select{height:44px;font-size:16px}
+  textarea{font-size:16px}
+  .field{margin-top:8px}
+  .seg button{min-height:34px}
+  /* planta */
+  .plan{gap:12px}
+  .stage{height:calc(100dvh - 150px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:360px;max-height:640px}
+  .stage-card{border-radius:20px}
+  .hud-tl{top:8px;left:8px;right:8px}
+  .hud-tr{top:62px;left:8px}
+  .toolbar{padding:4px;border-radius:18px;gap:2px}
+  .tb{min-width:44px;height:44px;padding:0 10px}
+  .tb-sep{margin:8px 3px}
+  .tb[aria-pressed="true"] span{display:none}
+  .tb svg{width:20px;height:20px}
+  .rk-bar .field:nth-child(3){display:none}
+  .hud-bl{left:8px;bottom:8px;max-width:calc(100% - 64px);gap:6px}
+  .hud-br{right:8px;bottom:8px}
+  .mini-card{padding:6px 10px;border-radius:14px;font-size:11.5px}
+  .readout{min-height:30px;font-size:11.5px}
+  .legend{width:min(190px,100%)}
+  .zoom button{width:42px;height:42px}
+  .toast{top:118px}
+  /* equipamentos, banda, relatório */
+  .devs{grid-template-columns:minmax(0,1fr);gap:12px}
+  .kpi{padding:10px 12px}.kpi b{font-size:19px}
+  .rep{gap:12px}
+  .gauge .num{font-size:46px}
+  /* rack e rede */
+  .rk-wrap{gap:12px}
+  .rk-wrap>.rk-col:nth-child(2){order:-1}
+  .rk-bar{gap:8px}.rk-bar .field{min-width:96px;flex:1}
+  .rk-bar>div:last-child{margin-left:0;width:100%}.rk-bar>div:last-child .btn{width:100%}
+  .rk-stage{max-height:62dvh;padding:6px;-webkit-overflow-scrolling:touch}
+  svg.rk{max-width:none}
+  .rk-list{max-height:46dvh}
+  .rk-item{cursor:default;padding:9px 11px}
+  #rkMsg{top:auto!important;bottom:84px;position:fixed;z-index:50}
+  .rk-wrap>.rk-col:last-child{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:760px) and (orientation:landscape){
+  .stage{height:calc(100dvh - 120px);min-height:260px}
+}
+@media (display-mode:standalone){html,body{overscroll-behavior:none}}
 </style>
 
 <nav class="rail" role="tablist" aria-label="Seções">
-  <button role="tab" data-tab="planta" aria-selected="true"><i data-i="home"></i><span class="lbl">Planta e sinal</span><span class="sr">Planta e sinal</span></button>
-  <button role="tab" data-tab="equipamentos" aria-selected="false"><i data-i="chip"></i><span class="lbl">Equipamentos</span><span class="sr">Equipamentos</span></button>
-  <button role="tab" data-tab="rack" aria-selected="false"><i data-i="rack"></i><span class="lbl">Rack e rede</span><span class="sr">Rack e rede</span></button>
-  <button role="tab" data-tab="banda" aria-selected="false"><i data-i="gauge"></i><span class="lbl">Teste de banda</span><span class="sr">Teste de banda</span></button>
-  <button role="tab" data-tab="relatorio" aria-selected="false"><i data-i="doc"></i><span class="lbl">Relatório</span><span class="sr">Relatório</span></button>
+  <button role="tab" data-tab="planta" aria-selected="true"><i data-i="home"></i><span class="lbl">Planta e sinal</span><span class="lbs">Planta</span><span class="sr">Planta e sinal</span></button>
+  <button role="tab" data-tab="equipamentos" aria-selected="false"><i data-i="chip"></i><span class="lbl">Equipamentos</span><span class="lbs">Modelos</span><span class="sr">Equipamentos</span></button>
+  <button role="tab" data-tab="rack" aria-selected="false"><i data-i="rack"></i><span class="lbl">Rack e rede</span><span class="lbs">Rack</span><span class="sr">Rack e rede</span></button>
+  <button role="tab" data-tab="banda" aria-selected="false"><i data-i="gauge"></i><span class="lbl">Teste de banda</span><span class="lbs">Banda</span><span class="sr">Teste de banda</span></button>
+  <button role="tab" data-tab="relatorio" aria-selected="false"><i data-i="doc"></i><span class="lbl">Relatório</span><span class="lbs">Relatório</span><span class="sr">Relatório</span></button>
 </nav>
 
 <div class="main">
@@ -326,7 +415,7 @@ details.cu summary{cursor:pointer;font-weight:700;font-size:13px}
             <button data-band="2" aria-pressed="false">6 GHz</button>
           </div></div>
           <div class="hud hud-bl">
-            <div class="mini-card readout" id="readout">Passe o cursor pela planta para ver o sinal estimado</div>
+            <div class="mini-card readout" id="readout">Toque na planta para ver o sinal</div>
             <div class="mini-card legend"><div class="bar"></div><div class="tick"><span>−90</span><span>−80</span><span>−70</span><span>−60</span><span>−50 dBm</span></div></div>
           </div>
           <div class="hud hud-br">
@@ -1043,7 +1132,7 @@ function updateReadout(p){
 }
 function zoomAt(f,cx,cy){const ns=clamp(V.s*f,ZMIN,ZMAX),k=ns/V.s;V.ox=cx-(cx-V.ox)*k;V.oy=cy-(cy-V.oy)*k;V.s=ns;scheduleRender()}
 ov.addEventListener('pointerdown',onDown);ov.addEventListener('pointermove',onMove);ov.addEventListener('pointerup',onUp);ov.addEventListener('pointercancel',onUp);
-ov.addEventListener('pointerleave',()=>{if(!D)$('#readout').textContent='Passe o cursor pela planta para ver o sinal estimado'});
+ov.addEventListener('pointerleave',()=>{if(!D)$('#readout').textContent='Toque na planta para ver o sinal'});
 ov.addEventListener('contextmenu',e=>e.preventDefault());
 ov.addEventListener('dblclick',()=>{if(TOOL==='wall'){DR.start=null;renderOverlay()}});
 ov.addEventListener('wheel',e=>{e.preventDefault();const r=ov.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.0016),e.clientX-r.left,e.clientY-r.top)},{passive:false});
@@ -1384,18 +1473,22 @@ function rkPalette(){
     <div class="s">${d.u}U${d.form==='desk'?' (mesa, em bandeja)':''} · ${portTxt(d)||'sem portas'} · ${d.w!=null?nf(d.w,1)+' W':'consumo n/c'}</div></div>`).join(''):'<div class="empty">Nenhum equipamento neste filtro.</div>';
 }
 /* desenho do rack */
+function portDims(d){
+  const rj=d.rj||0,sf=d.sfp||0,nar=RK.geo&&RK.geo.nar,rows=(rj>12||sf>6)?2:1,cols=Math.ceil(rj/rows),scols=Math.ceil(sf/rows);
+  const cw=nar?9.5:12.5,sw=nar?12:15,ch=rows===2?(nar?9:10.5):(nar?10:12),gap=nar?2:2.5;
+  return {rj,sf,rows,cols,scols,cw,sw,ch,gap,gh:rows*ch+(rows-1)*gap,wp:cols*cw+(scols?8+scols*sw:0)};
+}
 function portCells(d,rightX,y,h,used,K){
-  const rj=d.rj||0,sf=d.sfp||0;if(!rj&&!sf)return '';
-  const rows=(rj>12||sf>6)?2:1,cols=Math.ceil(rj/rows),scols=Math.ceil(sf/rows),cw=12.5,sw=15,ch=rows===2?10.5:12,gh=rows*ch+(rows-1)*2.5;
-  const wp=cols*cw+(scols?8+scols*sw:0),x0=rightX-wp,y0=y+(h-gh)/2;let s='';
-  for(let i=0;i<rj;i++){const cx=x0+Math.floor(i/rows)*cw,cy=y0+(i%rows)*(ch+2.5),poe=i<(d.poeN||0),u=i<used;
+  const g=portDims(d);if(!g.rj&&!g.sf)return '';
+  const {rj,sf,rows,cols,cw,sw,ch,gap,gh,wp}=g,x0=rightX-wp,y0=y+(h-gh)/2;let s='';
+  for(let i=0;i<rj;i++){const cx=x0+Math.floor(i/rows)*cw,cy=y0+(i%rows)*(ch+gap),poe=i<(d.poeN||0),u=i<used;
     s+=`<rect x="${cx}" y="${cy}" width="${cw-2}" height="${ch}" rx="1.5" fill="${u?'var(--ok)':poe?'var(--accent)':'var(--ctl)'}" fill-opacity="${u?.95:poe?.45:1}" stroke="${poe?'var(--accent-ink)':'var(--fg-3)'}" stroke-width=".8"/>`}
-  for(let i=0;i<sf;i++){const cx=x0+cols*cw+8+Math.floor(i/rows)*sw,cy=y0+(i%rows)*(ch+2.5),u=(rj+i)<used;
+  for(let i=0;i<sf;i++){const cx=x0+cols*cw+8+Math.floor(i/rows)*sw,cy=y0+(i%rows)*(ch+gap),u=(rj+i)<used;
     s+=`<rect x="${cx}" y="${cy}" width="${sw-2.5}" height="${ch}" rx="2" fill="${u?'var(--ok)':'var(--fg-3)'}" fill-opacity="${u?.95:.5}" stroke="var(--fg-3)" stroke-width=".8"/>`}
   return s;
 }
 function trunc(t,n){t=String(t);return t.length>n?t.slice(0,Math.max(1,n-1))+'…':t}
-function rkGeo(){const R=S.rack,K=.9;return {K,UP:UMM*K,PW:RACKW*K,L:42,T:30,RW:(RACKW-450)/2*K,H:30+R.u*UMM*K+34,W:42+RACKW*K+84}}
+function rkGeo(){const R=S.rack,aw=($('#rkStage').clientWidth||900)-14,nar=aw<520,L=nar?28:42,Rr=nar?12:84,K=nar?clamp((aw-L-Rr)/RACKW,.5,.9):.9;return {K,nar,UP:UMM*K,PW:RACKW*K,L,T:nar?16:30,RW:(RACKW-450)/2*K,H:(nar?16:30)+R.u*UMM*K+34,W:L+RACKW*K+Rr}}
 function rkDraw(){
   const el=$('#rkStage'),R=S.rack,c=rkCalc();RK.c=c;
   $$('#rkView button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rv===RK.view)));
@@ -1425,7 +1518,7 @@ function rkDraw(){
     }else{
       h+=`<rect x="${L+1}" y="${y+1.5}" width="${PW-2}" height="${ht-3}" rx="3" fill="url(#rkg)" stroke="var(--line-strong)"/><rect x="${L+1}" y="${y+1.5}" width="4" height="${ht-3}" fill="${col}"/>`;
       for(let k=0;k<d.u;k++){[6.35,22.225,38.1].forEach(m=>{const hy=y+ht-(k*UMM+m)*K;h+=`<circle cx="${L+RW/2}" cy="${hy}" r="2.1" fill="var(--bg)" stroke="var(--fg-3)" stroke-width=".7"/><circle cx="${L+PW-RW/2}" cy="${hy}" r="2.1" fill="var(--bg)" stroke="var(--fg-3)" stroke-width=".7"/>`})}
-      const rx=L+PW-RW-10,pc=portCells(d,rx,y,ht,st.used,K),wp=Math.ceil((d.rj||0)/(((d.rj||0)>12||(d.sfp||0)>6)?2:1))*12.5+((d.sfp||0)?8+Math.ceil((d.sfp||0)/(((d.rj||0)>12||(d.sfp||0)>6)?2:1))*15:0),room=Math.floor((rx-wp-(L+RW+12)-8)/6.6);
+      const rx=L+PW-RW-10,pc=portCells(d,rx,y,ht,st.used,K),wp=portDims(d).wp,room=Math.floor((rx-wp-(L+RW+12)-8)/6.6);
       h+=pc;
       h+=`<text x="${L+RW+12}" y="${y+Math.min(17,ht/2-2)}" font-size="12" font-weight="700" fill="var(--fg)">${esc(trunc(nm,Math.max(6,room)))}</text><text x="${L+RW+12}" y="${y+Math.min(31,ht/2+12)}" font-size="9.5" fill="var(--fg-2)" style="font-family:var(--font-mono)">${esc(trunc(it.name&&d.cat!=='acc'?d.model:(d.cat==='acc'?'':CATN[d.cat])+(d.poeW?' · '+nf(d.poeW,0)+' W PoE':''),Math.max(8,Math.floor(room*1.15))))}</text>`;
     }
@@ -1435,8 +1528,8 @@ function rkDraw(){
   }
   h+=`<rect id="rkGhost" x="${L}" y="0" width="${PW}" height="${UP}" rx="4" fill="var(--ok)" fill-opacity=".25" stroke="var(--ok)" stroke-width="2" stroke-dasharray="5 4" visibility="hidden" pointer-events="none"/>`;
   const dx=L+PW+18;
-  h+=`<path d="M${dx-5} ${T}H${dx}V${T+R.u*UP}H${dx-5}" fill="none" stroke="var(--fg-2)" stroke-width="1.4"/><text transform="translate(${dx+16},${T+R.u*UP/2}) rotate(90)" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--fg-2)" style="font-family:var(--font-mono)">${R.u}U = ${nf(R.u*UMM,0)} mm de altura útil</text>`;
-  h+=`<text x="${L}" y="${H-10}" font-size="11" fill="var(--fg-3)" style="font-family:var(--font-mono)">1U = 44,45 mm · largura 19 pol. = 482,6 mm · U1 na base</text></svg>`;
+  if(!g.nar)h+=`<path d="M${dx-5} ${T}H${dx}V${T+R.u*UP}H${dx-5}" fill="none" stroke="var(--fg-2)" stroke-width="1.4"/><text transform="translate(${dx+16},${T+R.u*UP/2}) rotate(90)" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--fg-2)" style="font-family:var(--font-mono)">${R.u}U = ${nf(R.u*UMM,0)} mm de altura útil</text>`;
+  h+=`<text x="${L}" y="${H-10}" font-size="11" fill="var(--fg-3)" style="font-family:var(--font-mono)">${g.nar?'1U = 44,45 mm · 19 pol. · U1 na base':'1U = 44,45 mm · largura 19 pol. = 482,6 mm · U1 na base'}</text></svg>`;
   el.innerHTML=h;rkBind();
 }
 function rkBind(){
@@ -1451,12 +1544,13 @@ function rkBind(){
   });
   svg.addEventListener('pointermove',e=>{
     const D=RK.drag;if(!D)return;const it=S.rack.items.find(x=>x.id===D.id),d=getNet(it.dev),g=RK.geo;
-    const du=-Math.round((e.clientY-D.y0)/g.UP),u=D.u0+du;
+    const sc=($('#rkSvg').getBoundingClientRect().width/$('#rkSvg').viewBox.baseVal.width)||1,du=-Math.round((e.clientY-D.y0)/sc/g.UP),u=D.u0+du;
     if(du!==0||Math.abs(e.clientY-D.y0)>4)D.moved=true;
     if(!D.moved)return;
     D.u=u;D.el.setAttribute('transform',`translate(0,${-(u-D.u0)*g.UP})`);D.el.style.opacity='.85';
     rkShowGhost(u,d.u,rkFree(u,d.u,D.id));
   });
+  svg.addEventListener('pointercancel',()=>{RK.drag=null;rkDraw()});
   svg.addEventListener('pointerup',e=>{
     const D=RK.drag;RK.drag=null;if(!D)return;
     const it=S.rack.items.find(x=>x.id===D.id),d=getNet(it.dev);
@@ -1472,7 +1566,7 @@ function rkShowGhost(start,h,ok){
 }
 function rkStartAt(clientY,d){
   const svg=$('#rkSvg');if(!svg||!RK.geo)return 0;const r=svg.getBoundingClientRect(),g=RK.geo,R=S.rack;
-  const row=Math.floor((clientY-r.top-g.T)/g.UP),rowU=R.u-row;return rowU-(d.u-1);
+  const sc=(r.width/svg.viewBox.baseVal.width)||1,row=Math.floor(((clientY-r.top)/sc-g.T)/g.UP),rowU=R.u-row;return rowU-(d.u-1);
 }
 /* topologia */
 function rkTopo(c){
@@ -1589,6 +1683,7 @@ function rkInit(){
     const cat=v('#cuCat'),dev={id:'c'+uid(),b:'gn',model:name,cat,mgmt:cat==='poe'||cat==='managed',form:full?'rack':'desk',u,dim:[full?RACKW:Math.max(60,n('#cuWd')||250),n('#cuD')||null,u*UMM],rj:n('#cuRj'),sfp:n('#cuSfp'),poeN:poeW?poeN||n('#cuRj'):0,poeW:poeW||undefined,poeStd:poeW?'informado pelo usuário':undefined,w:v('#cuWatt')===''?null:n('#cuWatt'),custom:true,generic:true,note:'Equipamento personalizado, valores informados por você.'};
     pushUndo();S.rack.custom.push(dev);rkUpdate();rkPalette();e.target.reset();$('#rkCustom').open=false;rkMsg(name+' foi adicionado à lista.');
   });
+  let rkW=0;addEventListener('resize',()=>{if($('#v-rack').hidden)return;const w=$('#rkStage').clientWidth;if(Math.abs(w-rkW)>20){rkW=w;rkDraw()}});
   document.addEventListener('keydown',e=>{
     if($('#v-rack').hidden||!RK.sel)return;const t=e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT')return;
     if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();rkRemove(RK.sel)}
@@ -1632,11 +1727,14 @@ $('#btnTheme').onclick=()=>{
 $('#projName').addEventListener('input',e=>{S.meta.client=e.target.value;save()});
 let newT=0;
 $('#btnNew').onclick=()=>{
-  if(!newT){$('#btnNewTxt').textContent='Confirmar: limpar tudo?';newT=setTimeout(()=>{newT=0;$('#btnNewTxt').textContent='Nova vistoria'},3500);return}
-  clearTimeout(newT);newT=0;$('#btnNewTxt').textContent='Nova vistoria';
+  if(!newT){$('#btnNewTxt').textContent='Confirmar: limpar tudo?';$('#btnNew').classList.add('arm');newT=setTimeout(()=>{newT=0;$('#btnNewTxt').textContent='Nova vistoria';$('#btnNew').classList.remove('arm')},3500);return}
+  clearTimeout(newT);newT=0;$('#btnNewTxt').textContent='Nova vistoria';$('#btnNew').classList.remove('arm');
   S=blankState();SEL=null;UNDO=[];SUG=null;$('#projName').value=S.meta.client;$('#btnScale').disabled=true;setTool('select');dirty();fitted=false;fit();renderSide();RK.sel=null;toast('Vistoria nova. Use Planta para subir uma imagem ou desenhe com Cômodo e Parede.');
 };
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>applyTheme(document.documentElement.getAttribute('data-theme')));
+
+/* ---------- PWA ---------- */
+try{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.(ai|com)|claudeusercontent/.test(location.hostname))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}catch(e){}
 
 /* ---------- início ---------- */
 (function init(){
