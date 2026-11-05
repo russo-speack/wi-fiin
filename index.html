@@ -1,0 +1,1653 @@
+<title>Ondas Wi-Fi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: trilho de ícones em vidro à esquerda, saudação no topo, palco grande com a planta e mapa de calor, coluna lateral de ajustes e três cartões de indicadores. Vidro fosco sobre fundo quente em tom areia e sálvia, acento verde-limão como na referência. */
+:root{
+  --font-ui:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --bg:#d9d3c5; --blob1:#f4efe3; --blob2:#a9b88a; --blob3:#e6c9a2;
+  --fg:#22251d; --fg-2:#555a49; --fg-3:#7b806b;
+  --glass:rgba(255,255,255,.40); --glass-2:rgba(255,255,255,.66); --glass-line:rgba(255,255,255,.72);
+  --shadow:0 18px 50px -20px rgba(50,48,30,.38);
+  --stage:rgba(255,255,255,.34); --line:rgba(34,37,29,.10); --line-strong:rgba(34,37,29,.22);
+  --ctl:rgba(255,255,255,.58); --halo:rgba(255,255,255,.78);
+  --accent:#b6d45a; --accent-ink:#4a6212; --on-accent:#1d2510;
+  --ok:#2c9a62; --warn:#c0830f; --bad:#c04a3a;
+  --dev-hi:#ffffff; --dev-lo:#cdd1c2;
+  --mat-drywall:#80857a; --mat-madeira:#9a6a3a; --mat-vidro:#2f9bbd; --mat-alvenaria:#3a3c33; --mat-concreto:#1d1f19; --mat-metal:#4a5f8a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12140e; --blob1:#2b3320; --blob2:#1f3326; --blob3:#3a2f1f;
+    --fg:#eef1e4; --fg-2:#b2b7a1; --fg-3:#7f846f;
+    --glass:rgba(255,255,255,.07); --glass-2:rgba(255,255,255,.13); --glass-line:rgba(255,255,255,.16);
+    --shadow:0 18px 50px -20px rgba(0,0,0,.75);
+    --stage:rgba(0,0,0,.28); --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.22);
+    --ctl:rgba(255,255,255,.09); --halo:rgba(0,0,0,.5);
+    --accent:#c5e266; --accent-ink:#c5e266; --on-accent:#14190a;
+    --ok:#52c98a; --warn:#e0a93a; --bad:#ef7a68;
+    --dev-hi:#4a5040; --dev-lo:#232619;
+    --mat-drywall:#c1c6b3; --mat-madeira:#d19a62; --mat-vidro:#6fd0ef; --mat-alvenaria:#d7dac9; --mat-concreto:#f2f4ea; --mat-metal:#9bb2e3;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12140e; --blob1:#2b3320; --blob2:#1f3326; --blob3:#3a2f1f;
+  --fg:#eef1e4; --fg-2:#b2b7a1; --fg-3:#7f846f;
+  --glass:rgba(255,255,255,.07); --glass-2:rgba(255,255,255,.13); --glass-line:rgba(255,255,255,.16);
+  --shadow:0 18px 50px -20px rgba(0,0,0,.75);
+  --stage:rgba(0,0,0,.28); --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.22);
+  --ctl:rgba(255,255,255,.09); --halo:rgba(0,0,0,.5);
+  --accent:#c5e266; --accent-ink:#c5e266; --on-accent:#14190a;
+  --ok:#52c98a; --warn:#e0a93a; --bad:#ef7a68;
+  --dev-hi:#4a5040; --dev-lo:#232619;
+  --mat-drywall:#c1c6b3; --mat-madeira:#d19a62; --mat-vidro:#6fd0ef; --mat-alvenaria:#d7dac9; --mat-concreto:#f2f4ea; --mat-metal:#9bb2e3;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45;
+  padding-block:18px 28px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(58% 48% at 12% 8%,var(--blob1),transparent 72%),
+    radial-gradient(48% 52% at 88% 18%,var(--blob2),transparent 72%),
+    radial-gradient(56% 56% at 68% 96%,var(--blob3),transparent 72%);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.card{
+  background:var(--glass);border:1px solid var(--glass-line);border-radius:26px;box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(22px) saturate(1.35);backdrop-filter:blur(22px) saturate(1.35);
+  padding:16px 18px;min-width:0;
+}
+.card h3{margin:0 0 12px;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--fg-2);font-weight:700}
+.muted{color:var(--fg-2)} .mono{font-family:var(--font-mono)}
+.hint{color:var(--fg-3);font-size:12px;margin:10px 0 0}
+
+/* trilho */
+.rail{
+  position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:6px;padding:10px 8px;border-radius:32px;
+  background:var(--glass);border:1px solid var(--glass-line);box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(22px) saturate(1.35);backdrop-filter:blur(22px) saturate(1.35);
+}
+.rail button{width:46px;height:46px;border-radius:50%;border:0;background:transparent;color:var(--fg-2);display:grid;place-items:center;position:relative}
+.rail button svg{width:22px;height:22px}
+.rail button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.rail button:hover:not([aria-selected="true"]){background:var(--ctl)}
+.rail .lbl{position:absolute;left:58px;white-space:nowrap;padding:4px 10px;border-radius:10px;background:var(--glass-2);border:1px solid var(--glass-line);font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .15s;color:var(--fg)}
+.rail button:hover .lbl{opacity:1}
+.main{padding-left:84px;max-width:1560px;margin:0 auto}
+
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin-bottom:16px}
+.hello small{display:block;color:var(--fg-2);font-size:15px;font-weight:500}
+input.proj[type="text"]{font:inherit;font-size:clamp(26px,4.2vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.15;background:transparent;border:0;border-radius:0;border-bottom:1px dashed transparent;color:var(--fg);padding:0;height:auto;width:min(100%,560px);text-overflow:ellipsis}
+input.proj[type="text"]:hover,input.proj[type="text"]:focus{border-bottom-color:var(--line-strong);outline:none}
+[hidden]{display:none!important}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);font-weight:600;font-size:13px;color:var(--fg);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.pill svg{width:17px;height:17px}
+.pill.btn:hover{background:var(--glass-2)}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* planta */
+.plan{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+.stage-card{padding:0;overflow:hidden}
+.stage{position:relative;height:clamp(460px,68vh,800px);background:var(--stage);touch-action:none;user-select:none;-webkit-user-select:none}
+.stage canvas,.stage>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage>svg{touch-action:none}
+.stage[data-tool="wall"]>svg,.stage[data-tool="room"]>svg,.stage[data-tool="ap"]>svg,.stage[data-tool="meas"]>svg,.stage[data-tool="scale"]>svg,.stage[data-tool="door"]>svg,.stage[data-tool="win"]>svg,.stage[data-tool="label"]>svg,.stage[data-tool="tape"]>svg{cursor:crosshair}
+.stage[data-tool="select"]>svg{cursor:default}
+.hud{position:absolute;z-index:3}
+.hud-tl{top:12px;left:12px;right:12px}
+.toolbar{display:inline-flex;max-width:100%;gap:3px;padding:5px;border-radius:20px;background:var(--glass-2);border:1px solid var(--glass-line);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);overflow-x:auto;scrollbar-width:none}
+.toolbar::-webkit-scrollbar{display:none}
+.tb{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 11px;border-radius:15px;border:0;background:transparent;color:var(--fg);font-weight:600;font-size:12.5px;white-space:nowrap}
+.tb svg{width:18px;height:18px;flex:none}
+.tb:hover{background:var(--ctl)}
+.tb[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.tb:disabled{opacity:.4;cursor:not-allowed}
+.tb span{display:none}
+.tb[aria-pressed="true"] span{display:inline}
+.tb-sep{width:1px;background:var(--line-strong);margin:6px 4px;flex:none}
+.hud-tr{top:58px;left:12px}
+.seg{display:inline-flex;padding:4px;border-radius:16px;background:var(--glass-2);border:1px solid var(--glass-line);gap:2px;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.seg button{height:30px;padding:0 12px;border:0;border-radius:12px;background:transparent;font-weight:600;font-size:12.5px;color:var(--fg-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.hud-bl{left:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;max-width:calc(100% - 84px)}
+.hud-br{right:12px;bottom:12px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.mini-card{padding:8px 12px;border-radius:16px;background:var(--glass-2);border:1px solid var(--glass-line);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);font-size:12px}
+.readout{font-family:var(--font-mono);font-weight:500;min-height:34px;display:flex;align-items:center}
+.legend{display:grid;gap:5px;width:min(260px,100%)}
+.legend .bar{height:9px;border-radius:6px;background:linear-gradient(90deg,rgb(200,70,60),rgb(232,136,58),rgb(240,201,58),rgb(168,214,74),rgb(72,200,120),rgb(24,160,110))}
+.legend .tick{display:flex;justify-content:space-between;font:500 10.5px var(--font-mono);color:var(--fg-2)}
+.zoom{display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:var(--glass-2);border:1px solid var(--glass-line);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.zoom button{width:38px;height:36px;border:0;background:transparent;display:grid;place-items:center;color:var(--fg)}
+.zoom button+button{border-top:1px solid var(--line)}
+.zoom button:hover{background:var(--ctl)} .zoom svg{width:18px;height:18px}
+.scalebar{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font:500 11px var(--font-mono);color:var(--fg)}
+.scalebar i{display:block;height:6px;border:2px solid var(--fg);border-top:0}
+.toast{position:absolute;left:50%;top:108px;transform:translateX(-50%);z-index:5;max-width:min(92%,460px);text-align:center;padding:9px 16px;border-radius:14px;background:var(--glass-2);border:1px solid var(--glass-line);font-weight:600;font-size:12.5px;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);pointer-events:none}
+.pop{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);padding:16px;border-radius:20px;background:var(--glass-2);border:1px solid var(--glass-line);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);display:grid;gap:10px;width:min(300px,90%)}
+.pop label{font-weight:600}
+
+/* controles */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 15px;border-radius:14px;border:1px solid var(--line-strong);background:var(--ctl);font-weight:600;font-size:13px;color:var(--fg)}
+.btn svg{width:17px;height:17px;flex:none}
+.btn:hover{background:var(--glass-2)}
+.btn.primary{background:var(--accent);border-color:transparent;color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.field{display:grid;gap:5px;margin-top:10px}
+.field>span,.field>label{display:flex;justify-content:space-between;font-size:12px;color:var(--fg-2);font-weight:600}
+.field b{color:var(--fg);font-family:var(--font-mono);font-weight:500}
+input[type="text"],input[type="number"],select,textarea{width:100%;height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--line-strong);background:var(--ctl);color:var(--fg);min-width:0}
+textarea{height:auto;padding:10px 12px;resize:vertical;font-family:var(--font-mono);font-size:12px}
+select option,select optgroup{background:var(--bg);color:var(--fg)}
+input[type="range"]{width:100%;accent-color:var(--accent-ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mats{display:grid;gap:6px}
+.mat{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:10px;padding:7px 10px;border-radius:13px;border:1px solid transparent;background:var(--ctl);text-align:left;font-size:12.5px;font-weight:600}
+.mat i{display:block;height:6px;border-radius:3px}
+.mat small{font:500 11px var(--font-mono);color:var(--fg-2)}
+.mat[aria-pressed="true"]{border-color:var(--accent-ink);background:var(--glass-2)}
+.tag{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:11px;font-weight:700;background:var(--ctl);border:1px solid var(--line);color:var(--fg-2)}
+.tag.est{color:var(--warn);border-color:var(--warn)}
+.dev-fig{display:grid;place-items:center;padding:6px 0 2px}
+.dev-fig svg{max-width:100%;height:auto}
+.plist{display:grid;gap:6px}
+.pitem{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 11px;border-radius:12px;background:var(--ctl);border:1px solid transparent;font-size:12.5px;text-align:left;width:100%}
+.pitem:hover{border-color:var(--line-strong)}
+.pitem .mono{font-size:12px}
+.delta-ok{color:var(--ok)} .delta-warn{color:var(--warn)} .delta-bad{color:var(--bad)}
+
+/* indicadores */
+.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.stat{display:flex;gap:16px;align-items:center;min-height:132px}
+.stat .big{font-size:38px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.stat .big small{font-size:15px;font-weight:600;color:var(--fg-2);margin-left:3px}
+.stat p{margin:6px 0 0;color:var(--fg-2);font-size:12.5px}
+.ring{width:96px;height:96px;flex:none}
+.ring circle{fill:none;stroke-width:9}
+.ring .tr{stroke:var(--line-strong)}
+.ring .vl{stroke:var(--accent-ink);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring text{font:700 20px var(--font-ui);fill:var(--fg)}
+.inl{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--fg-2)}
+.inl input{width:72px;height:30px}
+
+/* telas */
+.view-head{margin:4px 0 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.view-head h2{margin:0;font-size:24px;letter-spacing:-.02em}
+.view-head p{margin:4px 0 0;color:var(--fg-2);max-width:62ch}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.devs{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:16px}
+.dev h4{margin:0;font-size:18px;letter-spacing:-.01em}
+.dev .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.dev .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+dl.spec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 14px;margin:12px 0 0;font-size:12.5px}
+dl.spec dt{color:var(--fg-3);font-weight:600}
+dl.spec dd{margin:0;text-align:right;font-family:var(--font-mono);font-size:12px}
+.src{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;font-size:12px}
+.src a{color:var(--accent-ink);font-weight:600;text-decoration:none}
+.src a:hover{text-decoration:underline}
+.speed{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.gauge{display:grid;place-items:center;padding:8px 0}
+.gauge svg{width:min(320px,100%);height:auto}
+.gauge .tr{stroke:var(--line-strong)} .gauge .vl{stroke:var(--accent-ink);stroke-linecap:round}
+.gauge .num{font:700 54px var(--font-ui);fill:var(--fg);letter-spacing:-.03em}
+.gauge .un{font:600 14px var(--font-ui);fill:var(--fg-2)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px}
+.metric{padding:12px;border-radius:16px;background:var(--ctl);border:1px solid var(--line)}
+.metric small{display:block;color:var(--fg-2);font-weight:600;font-size:11.5px}
+.metric b{font:600 22px var(--font-ui);font-variant-numeric:tabular-nums}
+.links{display:grid;gap:8px}
+.links a{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;background:var(--ctl);border:1px solid var(--line);color:var(--fg);text-decoration:none;font-weight:600}
+.links a:hover{background:var(--glass-2)}
+.links a small{display:block;font-weight:500;color:var(--fg-2)}
+.links svg{width:17px;height:17px;flex:none;color:var(--fg-2)}
+.spark{width:100%;height:64px;margin-top:10px}
+.spark polyline{fill:none;stroke:var(--accent-ink);stroke-width:2;stroke-linejoin:round}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--fg-2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl .num{font-family:var(--font-mono);text-align:right}
+.scroll-x{overflow-x:auto}
+.rep{display:grid;gap:16px}
+.rep-top{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+.snap{width:100%;height:auto;border-radius:18px;display:block;background:var(--stage)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kpi{padding:12px 14px;border-radius:16px;background:var(--ctl);border:1px solid var(--line)}
+.kpi small{display:block;color:var(--fg-2);font-weight:600;font-size:11.5px}
+.kpi b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.recs{margin:0;padding-left:18px;display:grid;gap:6px}
+.empty{padding:20px;text-align:center;color:var(--fg-2);border:1px dashed var(--line-strong);border-radius:16px}
+.note{font-size:12px;color:var(--fg-2);margin:14px 0 0}
+
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+
+.rk-wrap{display:grid;grid-template-columns:300px minmax(0,1fr) 330px;gap:16px;align-items:start}
+.rk-col{display:grid;gap:16px;min-width:0}
+#rkSum .kpi b{white-space:nowrap;font-size:19px}
+.rk-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.rk-bar .field{margin:0;min-width:110px}
+.rk-stage{overflow:auto;border-radius:18px;background:var(--stage);padding:10px;max-height:78vh;position:relative;touch-action:pan-y}
+svg.rk{display:block;margin:0 auto;font-family:var(--font-ui);user-select:none;-webkit-user-select:none}
+.rk-list{display:grid;gap:8px;max-height:56vh;overflow:auto;margin-top:12px}
+.rk-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--ctl);border:1px solid var(--line);cursor:grab}
+.rk-item:hover{border-color:var(--line-strong)}
+.rk-item .s{grid-column:1/-1;font:500 11px var(--font-mono);color:var(--fg-2)}
+.btn.mini{height:30px;min-width:30px;padding:0 9px;border-radius:10px}
+.btn.mini svg{width:15px;height:15px}
+details.cu summary{cursor:pointer;font-weight:700;font-size:13px}
+@media (max-width:1180px){.rk-wrap{grid-template-columns:280px minmax(0,1fr)}.rk-wrap>.rk-col:last-child{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}}
+@media (max-width:860px){.rk-wrap{grid-template-columns:minmax(0,1fr)}.rk-list{max-height:40vh}}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}.ring .vl{transition:none}}
+
+@media (max-width:1060px){
+  .plan{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .speed,.rep-top{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  body{padding-bottom:98px}
+  .main{padding-left:0}
+  .rail{top:auto;bottom:max(10px,env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);flex-direction:row;padding:7px 9px;border-radius:30px}
+  .rail .lbl{display:none}
+  .rail button{width:50px;height:46px;border-radius:23px}
+  .tb span{display:none}
+  .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+</style>
+
+<nav class="rail" role="tablist" aria-label="Seções">
+  <button role="tab" data-tab="planta" aria-selected="true"><i data-i="home"></i><span class="lbl">Planta e sinal</span><span class="sr">Planta e sinal</span></button>
+  <button role="tab" data-tab="equipamentos" aria-selected="false"><i data-i="chip"></i><span class="lbl">Equipamentos</span><span class="sr">Equipamentos</span></button>
+  <button role="tab" data-tab="rack" aria-selected="false"><i data-i="rack"></i><span class="lbl">Rack e rede</span><span class="sr">Rack e rede</span></button>
+  <button role="tab" data-tab="banda" aria-selected="false"><i data-i="gauge"></i><span class="lbl">Teste de banda</span><span class="sr">Teste de banda</span></button>
+  <button role="tab" data-tab="relatorio" aria-selected="false"><i data-i="doc"></i><span class="lbl">Relatório</span><span class="sr">Relatório</span></button>
+</nav>
+
+<div class="main">
+  <header class="top">
+    <div class="hello">
+      <small id="greet">Vistoria técnica de Wi-Fi</small>
+      <input id="projName" class="proj" type="text" value="Residência Silva" aria-label="Nome da vistoria" maxlength="60">
+    </div>
+    <div class="chips">
+      <span class="pill" id="exChip"><span class="dot"></span>Planta de exemplo</span>
+      <button class="pill btn" id="btnNew" type="button"><i data-i="plus"></i><span id="btnNewTxt">Nova vistoria</span></button>
+      <button class="pill btn" id="btnTheme" type="button" aria-label="Alternar tema claro e escuro"><i data-i="moon"></i></button>
+    </div>
+  </header>
+
+  <!-- PLANTA -->
+  <section class="view" id="v-planta">
+    <div class="plan">
+      <div class="card stage-card">
+        <div class="stage" id="stage" data-tool="select">
+          <canvas id="cv"></canvas>
+          <svg id="ov" aria-label="Planta baixa interativa" role="img"></svg>
+          <div class="hud hud-tl"><div class="toolbar" id="toolbar">
+            <button class="tb" data-tool="select" aria-pressed="true" title="Selecionar e mover (V)"><i data-i="select"></i><span>Selecionar</span></button>
+            <button class="tb" data-tool="wall" aria-pressed="false" title="Desenhar parede (W)"><i data-i="wall"></i><span>Parede</span></button>
+            <button class="tb" data-tool="room" aria-pressed="false" title="Desenhar cômodo (R)"><i data-i="room"></i><span>Cômodo</span></button>
+            <button class="tb" data-tool="ap" aria-pressed="false" title="Posicionar AP (A)"><i data-i="ap"></i><span>AP</span></button>
+            <button class="tb" data-tool="meas" aria-pressed="false" title="Ponto de medição de sinal (M)"><i data-i="pin"></i><span>Medição</span></button>
+            <i class="tb-sep"></i>
+            <button class="tb" data-tool="door" aria-pressed="false" title="Abrir porta na parede (D)"><i data-i="door"></i><span>Porta</span></button>
+            <button class="tb" data-tool="win" aria-pressed="false" title="Abrir janela na parede (J)"><i data-i="window"></i><span>Janela</span></button>
+            <button class="tb" data-tool="label" aria-pressed="false" title="Nomear ambiente (T)"><i data-i="text"></i><span>Nome</span></button>
+            <button class="tb" data-tool="tape" aria-pressed="false" title="Medir distância (K)"><i data-i="ruler"></i><span>Medir</span></button>
+            <button class="tb" id="btnDims" aria-pressed="true" title="Mostrar cotas das paredes (C)"><i data-i="dims"></i><span>Cotas</span></button>
+            <i class="tb-sep"></i>
+            <button class="tb" id="btnImg" title="Usar imagem da planta como fundo"><i data-i="image"></i><span>Planta</span></button>
+            <button class="tb" data-tool="scale" aria-pressed="false" id="btnScale" title="Calibrar escala da imagem (E)" disabled><i data-i="calib"></i><span>Escala</span></button>
+            <i class="tb-sep"></i>
+            <button class="tb" id="btnUndo" title="Desfazer (Ctrl+Z)"><i data-i="undo"></i><span>Desfazer</span></button>
+          </div></div>
+          <div class="hud hud-tr"><div class="seg" id="bandSeg" role="group" aria-label="Banda de frequência">
+            <button data-band="0" aria-pressed="false">2,4 GHz</button>
+            <button data-band="1" aria-pressed="true">5 GHz</button>
+            <button data-band="2" aria-pressed="false">6 GHz</button>
+          </div></div>
+          <div class="hud hud-bl">
+            <div class="mini-card readout" id="readout">Passe o cursor pela planta para ver o sinal estimado</div>
+            <div class="mini-card legend"><div class="bar"></div><div class="tick"><span>−90</span><span>−80</span><span>−70</span><span>−60</span><span>−50 dBm</span></div></div>
+          </div>
+          <div class="hud hud-br">
+            <div class="mini-card scalebar" id="scalebar"></div>
+            <div class="zoom"><button id="zIn" aria-label="Aproximar"><i data-i="plus"></i></button><button id="zOut" aria-label="Afastar"><i data-i="minus"></i></button><button id="zFit" aria-label="Ajustar à tela"><i data-i="fit"></i></button></div>
+          </div>
+          <div class="toast" id="toast" hidden></div>
+          <div class="pop" id="scalePop" hidden>
+            <label for="scaleDist">Distância real entre os dois pontos (m)</label>
+            <input id="scaleDist" type="number" min="0.1" step="0.01" value="5">
+            <div class="btnrow" style="margin:0"><button class="btn primary" id="scaleOk" type="button">Aplicar escala</button><button class="btn" id="scaleNo" type="button">Cancelar</button></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side" style="display:grid;gap:16px;min-width:0">
+        <div class="card" id="cAdd">
+          <h3>Adicionar equipamento</h3>
+          <div class="seg" id="brandSeg" style="width:100%;display:flex">
+            <button data-b="all" aria-pressed="true" style="flex:1">Todos</button>
+            <button data-b="tp" aria-pressed="false" style="flex:1">TP-Link</button>
+            <button data-b="ub" aria-pressed="false" style="flex:1">Ubiquiti</button>
+            <button data-b="zy" aria-pressed="false" style="flex:1">Zyxel</button>
+          </div>
+          <div class="field"><label for="selDev">Modelo</label><select id="selDev"></select></div>
+          <p class="hint" id="devMini" style="margin-top:8px"></p>
+          <div class="btnrow">
+            <button class="btn primary" id="btnPlace" type="button"><i data-i="ap"></i>Posicionar na planta</button>
+            <button class="btn" id="btnSuggest" type="button"><i data-i="spark"></i>Sugerir local</button>
+          </div>
+          <div id="sugBox"></div>
+        </div>
+        <div class="card" id="cRoom">
+          <h3>Cômodo por medidas</h3>
+          <div class="row2"><div class="field" style="margin-top:0"><label for="rmW">Largura (m)</label><input id="rmW" type="number" min="0.5" step="0.01" placeholder="4,20"></div><div class="field" style="margin-top:0"><label for="rmH">Comprimento (m)</label><input id="rmH" type="number" min="0.5" step="0.01" placeholder="3,50"></div></div>
+          <div class="field"><label for="rmName">Nome do ambiente</label><input id="rmName" type="text" placeholder="Sala" maxlength="30"></div>
+          <div class="btnrow"><button class="btn primary" id="btnRoom" type="button"><i data-i="room"></i>Criar cômodo</button></div>
+          <p class="hint">Digite as medidas do laser ou da trena. O cômodo aparece no centro da tela, pronto para arrastar.</p>
+        </div>
+        <div class="card" id="cInsp"></div>
+        <div class="card" id="cMats">
+          <h3>Material da parede</h3>
+          <div class="mats" id="mats"></div>
+          <p class="hint">Perdas típicas de mercado por banda (2,4 / 5 / 6 GHz). Ajuste o modelo com medições reais.</p>
+        </div>
+        <div class="card" id="cMeas"></div>
+      </aside>
+
+      <div class="stats">
+        <div class="card stat" id="sCov"></div>
+        <div class="card stat" id="sAps"></div>
+        <div class="card stat" id="sCap"></div>
+      </div>
+    </div>
+    <input type="file" id="fileImg" accept="image/*" hidden>
+  </section>
+
+  <!-- EQUIPAMENTOS -->
+  <section class="view" id="v-equipamentos" hidden>
+    <div class="view-head">
+      <div><h2>Equipamentos reais</h2><p>Especificações dos fabricantes e tamanhos desenhados na mesma escala, com um cartão de crédito como referência. Os valores de potência alimentam a simulação.</p></div>
+      <div class="seg" id="brandSeg2" role="group" aria-label="Filtrar marca">
+        <button data-b="all" aria-pressed="true">Todos</button><button data-b="tp" aria-pressed="false">TP-Link</button><button data-b="ub" aria-pressed="false">Ubiquiti</button><button data-b="zy" aria-pressed="false">Zyxel</button>
+      </div>
+    </div>
+    <div class="devs" id="devGrid"></div>
+    <p class="note">EIRP = potência de transmissão + ganho da antena, limitada a 30 dBm. Para TP-Link foram usados os valores EIRP de referência CE (conservadores). Para a Zyxel o fabricante não publica a potência por banda nas páginas consultadas, então a simulação usa 20 dBm (2,4 GHz) e 23 dBm (5 e 6 GHz), marcados como estimados. Confirme os limites da Anatel e a ficha técnica antes de fechar uma proposta.</p>
+  </section>
+
+  <!-- RACK -->
+  <section class="view" id="v-rack" hidden>
+    <div class="view-head"><div><h2>Rack e rede</h2><p>Monte a estrutura do ambiente: roteadores, MikroTik, switches e acessórios no rack em escala (1U = 44,45 mm), ligue os APs da planta aos switches e confira espaço, portas e orçamento PoE.</p></div>
+      <div class="seg" id="rkView" role="group" aria-label="Visualização"><button data-rv="rack" aria-pressed="true" type="button">Rack</button><button data-rv="topo" aria-pressed="false" type="button">Topologia</button></div></div>
+    <div class="rk-wrap">
+      <div class="rk-col">
+        <div class="card"><h3>Equipamentos</h3>
+          <div class="field" style="margin-top:0"><label for="rkCat">Tipo</label><select id="rkCat"><option value="all">Todos</option><option value="router">Roteador</option><option value="unmanaged">Switch não gerenciável</option><option value="managed">Switch gerenciável</option><option value="poe">Switch PoE</option><option value="acc">Acessório</option></select></div>
+          <div class="field"><label for="rkBrand">Marca</label><select id="rkBrand"><option value="all">Todas</option><option value="mt">MikroTik</option><option value="tp">TP-Link</option><option value="ub">Ubiquiti</option><option value="zy">Zyxel</option><option value="gn">Genérico</option></select></div>
+          <div class="rk-list" id="rkList"></div>
+          <details class="cu" id="rkCustom" style="margin-top:14px"><summary>Adicionar equipamento próprio</summary>
+            <form id="rkCustomForm" autocomplete="off">
+              <div class="field"><label for="cuName">Nome</label><input id="cuName" type="text" maxlength="40" placeholder="Ex.: Switch 16 portas"></div>
+              <div class="row2"><div class="field"><label for="cuCat">Tipo</label><select id="cuCat"><option value="unmanaged">Não gerenciável</option><option value="managed">Gerenciável</option><option value="poe">Switch PoE</option><option value="router">Roteador</option><option value="acc">Acessório</option></select></div><div class="field"><label for="cuU">Altura (U)</label><input id="cuU" type="number" min="1" max="6" step="1" value="1"></div></div>
+              <div class="row2"><div class="field"><label for="cuW">Formato</label><select id="cuW"><option value="19">Rack 19 pol.</option><option value="desk">Mesa (bandeja)</option></select></div><div class="field"><label for="cuD">Profund. (mm)</label><input id="cuD" type="number" min="0" step="1" placeholder="n/c"></div></div>
+              <div class="row2"><div class="field"><label for="cuRj">Portas RJ45</label><input id="cuRj" type="number" min="0" max="48" step="1" value="8"></div><div class="field"><label for="cuSfp">Portas SFP</label><input id="cuSfp" type="number" min="0" max="12" step="1" value="0"></div></div>
+              <div class="row2"><div class="field"><label for="cuPoeN">Portas PoE</label><input id="cuPoeN" type="number" min="0" max="48" step="1" value="0"></div><div class="field"><label for="cuPoeW">Orçamento PoE (W)</label><input id="cuPoeW" type="number" min="0" step="1" value="0"></div></div>
+              <div class="row2"><div class="field"><label for="cuWatt">Consumo máx. (W)</label><input id="cuWatt" type="number" min="0" step="0.1" placeholder="n/c"></div><div class="field"><label for="cuWd">Largura mesa (mm)</label><input id="cuWd" type="number" min="60" step="1" placeholder="250"></div></div>
+              <div class="btnrow"><button class="btn primary" type="submit">Adicionar à lista</button></div>
+            </form>
+          </details>
+        </div>
+      </div>
+      <div class="rk-col">
+        <div class="card" style="position:relative">
+          <div class="rk-bar">
+            <div class="field"><label for="rkU">Altura do rack</label><select id="rkU"><option value="4">4U</option><option value="6">6U</option><option value="9">9U</option><option value="12" selected>12U</option><option value="15">15U</option><option value="18">18U</option><option value="22">22U</option><option value="24">24U</option><option value="27">27U</option><option value="32">32U</option><option value="36">36U</option><option value="42">42U</option><option value="45">45U</option><option value="47">47U</option></select></div>
+            <div class="field"><label for="rkDepth">Profundidade</label><select id="rkDepth"><option value="450">450 mm</option><option value="600" selected>600 mm</option><option value="800">800 mm</option><option value="1000">1000 mm</option><option value="1200">1200 mm</option></select></div>
+            <div class="field"><span>Altura útil</span><b id="rkMm" style="min-height:38px;display:flex;align-items:center">—</b></div>
+            <div style="margin-left:auto"><button class="btn danger" id="rkClear" type="button">Esvaziar rack</button></div>
+          </div>
+          <div class="toast" id="rkMsg" hidden role="status" style="top:150px"></div>
+          <div class="rk-stage" id="rkStage"></div>
+          <p class="hint">Arraste da lista ou use o botão +. Clique num equipamento para ver detalhes e arraste para outro U. Itens de mesa ficam em uma bandeja de 1U. Delete remove o item selecionado.</p>
+        </div>
+      </div>
+      <div class="rk-col">
+        <div class="card" id="rkSum"></div>
+        <div class="card" id="rkAl"></div>
+        <div class="card" id="rkInsp"></div>
+        <div class="card" id="rkAps"></div>
+      </div>
+    </div>
+    <p class="note">Dimensões, portas e consumo vêm das fichas dos fabricantes (link em cada equipamento). Onde a ficha não cita o U, a altura de 44 mm foi tratada como 1U e o item aparece marcado na descrição. Valores “n/c” não constam na ficha consultada. Acessórios genéricos seguem o padrão EIA-310. Confirme o modelo exato e a versão de hardware antes de comprar.</p>
+  </section>
+
+  <!-- BANDA -->
+  <section class="view" id="v-banda" hidden>
+    <div class="view-head"><div><h2>Teste de banda</h2><p>Meça a velocidade em cada ponto da vistoria e salve o resultado no mapa. O teste rápido usa o servidor desta página; para velocidade até a internet use os testes completos ao lado.</p></div></div>
+    <div class="speed">
+      <div class="card">
+        <h3>Teste rápido de download e latência</h3>
+        <div class="gauge">
+          <svg viewBox="0 0 240 200" role="img" aria-label="Velocímetro">
+            <circle class="tr" id="gTr" cx="120" cy="110" r="84" fill="none" stroke-width="14" stroke-linecap="round"/>
+            <circle class="vl" id="gVl" cx="120" cy="110" r="84" fill="none" stroke-width="14"/>
+            <text class="num" id="gNum" x="120" y="116" text-anchor="middle">0</text>
+            <text class="un" x="120" y="140" text-anchor="middle">Mbps</text>
+            <text class="un" id="gMax" x="120" y="186" text-anchor="middle" style="font-size:11px"></text>
+          </svg>
+        </div>
+        <svg class="spark" id="spark" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline id="sparkLn" points=""/></svg>
+        <div class="metrics">
+          <div class="metric"><small>Download</small><b id="mDown">—</b></div>
+          <div class="metric"><small>Latência (ms)</small><b id="mPing">—</b></div>
+          <div class="metric"><small>Jitter (ms)</small><b id="mJit">—</b></div>
+        </div>
+        <div class="btnrow"><button class="btn primary" id="btnTest" type="button"><i data-i="gauge"></i><span id="btnTestTxt">Iniciar teste</span></button><span class="muted" id="testStatus" style="align-self:center;font-size:12.5px"></span></div>
+        <p class="note">O teste baixa um arquivo de 12 MB em 4 conexões durante cerca de 8 segundos. A velocidade de envio (upload) não pode ser medida aqui, use um dos testes completos.</p>
+      </div>
+      <div style="display:grid;gap:16px;min-width:0">
+        <div class="card">
+          <h3>Testes completos</h3>
+          <div class="links">
+            <a href="https://www.minhaconexao.com.br/" target="_blank" rel="noopener"><span>Minha Conexão<small>Teste de velocidade brasileiro</small></span><i data-i="ext"></i></a>
+            <a href="https://www.speedtest.net/" target="_blank" rel="noopener"><span>Speedtest<small>Ookla, download, upload e ping</small></span><i data-i="ext"></i></a>
+            <a href="https://fast.com/" target="_blank" rel="noopener"><span>Fast.com<small>Teste da Netflix, rápido</small></span><i data-i="ext"></i></a>
+            <a href="https://speed.cloudflare.com/" target="_blank" rel="noopener"><span>Cloudflare Speed Test<small>Inclui latência sob carga e jitter</small></span><i data-i="ext"></i></a>
+          </div>
+        </div>
+        <div class="card" id="cLog"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RELATÓRIO -->
+  <section class="view" id="v-relatorio" hidden>
+    <div class="view-head"><div><h2>Relatório da vistoria</h2><p>Resumo para o cliente com a planta, os equipamentos propostos, as medições e as recomendações.</p></div>
+      <button class="btn primary" id="btnCopy" type="button"><i data-i="copy"></i>Copiar resumo</button></div>
+    <div class="rep" id="rep"></div>
+  </section>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=(n,d=0)=>n==null||isNaN(n)?'n/c':Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+let UID=0; const uid=()=>'i'+(++UID).toString(36)+Math.random().toString(36).slice(2,5);
+
+/* ---------- ícones ---------- */
+const ICON={
+ select:'<path d="M5 3l14 7-6 2-2 6z"/>',
+ wall:'<path d="M4 18L20 6"/><circle cx="4" cy="18" r="1.6"/><circle cx="20" cy="6" r="1.6"/>',
+ room:'<rect x="4" y="6" width="16" height="12" rx="1.5"/>',
+ ap:'<path d="M4.5 9.5a11 11 0 0115 0M7.5 12.5a7 7 0 019 0M10.3 15.4a3 3 0 013.4 0"/><circle cx="12" cy="18.6" r="1.2"/>',
+ pin:'<path d="M12 21s6-5.6 6-11a6 6 0 10-12 0c0 5.4 6 11 6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+ ruler:'<rect x="2.5" y="8" width="19" height="8" rx="1.5" transform="rotate(-30 12 12)"/><path d="M8 10.6l1.2 2M11 8.9l1.2 2M14 7.1l1.2 2"/>',
+ image:'<rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/>',
+ undo:'<path d="M8 7L3.5 11.5 8 16M4 11.5h9a5 5 0 010 10"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>',
+ fit:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/>',
+ moon:'<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>',
+ home:'<path d="M4 11l8-6.5 8 6.5v8.5a1 1 0 01-1 1h-4.5v-6h-5v6H5a1 1 0 01-1-1z"/>',
+ chip:'<rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>',
+ gauge:'<path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-5"/>',
+ doc:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>',
+ rack:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 9h14M5 15h14M9 6h.01M9 12h.01M9 18h.01"/>',
+ trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+ ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/>',
+ spark:'<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>',
+ dup:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/>',
+ door:'<path d="M6 21V4h9l3 2v15M4 21h16"/><circle cx="12.5" cy="13" r=".6"/>',
+ window:'<rect x="5" y="4" width="14" height="16" rx="1"/><path d="M12 4v16M5 12h14"/>',
+ text:'<path d="M5 6h14M12 6v13M9 19h6"/>',
+ dims:'<path d="M4 7v10M20 7v10M4 12h16M7 10l-3 2 3 2M17 10l3 2-3 2"/>',
+ calib:'<path d="M3 17h18M3 13v8M21 13v8M8 17v-3M12 17v-4M16 17v-3M12 4v4M9.5 6L12 4l2.5 2"/>'
+};
+const ic=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+$$('[data-i]').forEach(el=>{el.innerHTML=ic(el.dataset.i);el.style.display='contents'});
+
+/* ---------- dados: materiais e equipamentos ---------- */
+const MAT={
+ drywall:{n:'Drywall / gesso',att:[3,4,5],th:3},
+ madeira:{n:'Madeira / porta',att:[3,4,5],th:3},
+ vidro:{n:'Vidro',att:[2,3,4],th:2.5},
+ alvenaria:{n:'Alvenaria 15 cm',att:[7,10,12],th:5},
+ concreto:{n:'Concreto armado',att:[15,20,24],th:7},
+ metal:{n:'Metal / elevador',att:[20,26,30],th:4}
+};
+const BRANDS={tp:{n:'TP-Link',line:'Omada',c:'#2aa7a1'},ub:{n:'Ubiquiti',line:'UniFi',c:'#3d7be0'},zy:{n:'Zyxel',line:'Nebula',c:'#e0873a'}};
+const U_TP={eap225:'https://www.tp-link.com/us/business-networking/ceiling-mount-access-point/eap225/v3/',eap610:'https://www.tp-link.com/us/business-networking/ceiling-mount-access-point/eap610/v2/',eap650:'https://www.tp-link.com/us/business-networking/omada-sdn-access-point/eap650/v1.2/',eap670:'https://static.tp-link.com/upload/product-overview/2025/202509/20250922/Datasheet_EAP670%202.20.pdf',eap773:'https://static.tp-link.com/upload/product-overview/2025/202512/20251226/EAP773%202.0_Datasheet.pdf'};
+const U_ZY='https://www.zyxel.com/global/en/products/wireless/';
+/* eirp = potência + ganho (dBm), limitada a 30; rate = taxa máx. PHY por banda (Mbps); dim = [L, A, esp.] mm */
+const CATALOG=[
+ {id:'eap225',b:'tp',model:'EAP225 v3',std:'Wi-Fi 5',tag:'AC1350',rate:[450,867,0],eirp:[20,23,0],gain:[4,5,0],ul:'1× GbE',poe:'802.3af/at',w:12.6,dim:[205.5,181.5,37.1],shape:'rect',wt:null,mount:'Teto ou parede',cov:null,cli:null,url:U_TP.eap225},
+ {id:'eap610',b:'tp',model:'EAP610 v2',std:'Wi-Fi 6',tag:'AX1800',rate:[574,1201,0],eirp:[20,23,0],gain:[4,5,0],ul:'1× GbE',poe:'802.3at',w:14.2,dim:[160,160,33.6],shape:'square',wt:null,mount:'Teto ou parede',cov:null,cli:'250+',url:U_TP.eap610},
+ {id:'eap650',b:'tp',model:'EAP650 v1.2',std:'Wi-Fi 6',tag:'AX3000',rate:[574,2402,0],eirp:[20,23,0],gain:[4,5,0],ul:'1× GbE',poe:'802.3at',w:14.7,dim:[160,160,33.6],shape:'square',wt:380,mount:'Teto ou parede',cov:140,cli:'250+',url:U_TP.eap650},
+ {id:'eap670',b:'tp',model:'EAP670',std:'Wi-Fi 6',tag:'AX5400',rate:[574,4804,0],eirp:[20,23,0],gain:[4,5,0],ul:'1× 2,5 GbE',poe:'802.3at',w:22.3,dim:[220,220,32.5],shape:'square',wt:670,mount:'Teto, parede ou T-bar',cov:140,cli:'250+',url:U_TP.eap670},
+ {id:'eap773',b:'tp',model:'EAP773',std:'Wi-Fi 7',tag:'BE11000',rate:[688,4324,5765],eirp:[20,23,23],gain:[4,5,5],ul:'1× 10 GbE',poe:'802.3at',w:25.4,dim:[220,220,32.5],shape:'square',wt:730,mount:'Teto, parede ou T-bar',cov:140,cli:'380+',url:U_TP.eap773},
+ {id:'u6lite',b:'ub',model:'U6-Lite',std:'Wi-Fi 6',tag:null,rate:[300,1200,0],eirp:[25.8,26,0],gain:[2.8,3,0],ul:'1× GbE',poe:'PoE 44–57 V',w:12,dim:[160,160,33],shape:'round',wt:300,mount:'Teto ou parede',cov:115,cli:'300+',url:'https://techspecs.ui.com/unifi/wifi/u6-lite'},
+ {id:'u6plus',b:'ub',model:'U6+',std:'Wi-Fi 6',tag:null,rate:[573.5,2400,0],eirp:[26,28.4,0],gain:[3,5.4,0],ul:'1× GbE',poe:'PoE 44–57 V',w:9,dim:[160,160,33],shape:'round',wt:338,mount:'Teto ou parede',cov:140,cli:'300+',url:'https://techspecs.ui.com/unifi/wifi/u6-plus'},
+ {id:'u6pro',b:'ub',model:'U6-Pro',std:'Wi-Fi 6',tag:null,rate:[573.5,4800,0],eirp:[26,30,0],gain:[4,6,0],ul:'1× GbE',poe:'PoE 44–57 V',w:13,dim:[197,197,35],shape:'round',wt:580,mount:'Teto ou parede',cov:140,cli:'250+',url:'https://techspecs.ui.com/unifi/wifi/u6-pro'},
+ {id:'u6ent',b:'ub',model:'U6-Enterprise',std:'Wi-Fi 6E',tag:null,rate:[573.5,4800,4800],eirp:[25.2,30,30],gain:[3.2,5.3,6],ul:'1× 2,5 GbE',poe:'PoE+',w:22,dim:[220,220,48],shape:'round',wt:960,mount:'Teto ou parede',cov:140,cli:'600+',url:'https://techspecs.ui.com/unifi/wifi/u6-enterprise'},
+ {id:'u7pro',b:'ub',model:'U7-Pro',std:'Wi-Fi 7',tag:null,rate:[688,4300,5800],eirp:[27,30,28.8],gain:[4,6,5.8],ul:'1× 2,5 GbE',poe:'PoE+',w:21,dim:[206,206,46],shape:'round',wt:680,mount:'Teto ou parede',cov:140,cli:'300+',url:'https://techspecs.ui.com/unifi/wifi/u7-pro'},
+ {id:'nwa50ax',b:'zy',model:'NWA50AX',std:'Wi-Fi 6',tag:'AX1800',rate:[574,1201,0],eirp:[20,23,0],gain:[3,4,0],ul:'1× GbE',poe:null,w:16,dim:[140,140,37.5],shape:'square',wt:290,mount:'Placa de montagem inclusa',cov:null,cli:null,est:true,url:U_ZY+'ax1800-4-stream-wifi-6-dual-radio-nebulaflex-access-point-nwa50ax/specifications'},
+ {id:'nwa110ax',b:'zy',model:'NWA110AX',std:'Wi-Fi 6',tag:'AX1800',rate:[574,1201,0],eirp:[20,23,0],gain:[5,6,0],ul:'1× GbE',poe:'802.3af/at',w:17,dim:[180,180,39],shape:'square',wt:453,mount:'Placa de montagem inclusa',cov:null,cli:null,est:true,url:U_ZY+'ax1800-4-stream-wifi-6-dual-radio-nebulaflex-access-point-nwa110ax'},
+ {id:'nwa220',b:'zy',model:'NWA220AX-6E',std:'Wi-Fi 6E',tag:'AXE5400',rate:[574,2402,2402],eirp:[20,23,23],gain:[3,5,6],ul:'1× 2,5 GbE',poe:null,w:21,dim:[180,180,42],shape:'square',wt:650,mount:'Placa de montagem inclusa',cov:null,cli:null,est:true,url:U_ZY+'axe5400-wifi-6e-dual-radio-nebulaflex-access-point-nwa220ax-6e/specifications'},
+ {id:'wax630s',b:'zy',model:'WAX630S',std:'Wi-Fi 6',tag:'AX3000',rate:[574,2402,0],eirp:[20,23,0],gain:[3,4.5,0],ul:'1× 2,5 GbE + 1× GbE',poe:null,w:19,dim:[180,180,39],shape:'square',wt:545,mount:'Placa de montagem inclusa',cov:null,cli:null,est:true,url:U_ZY+'ax3000-6-stream-wifi-6-dual-radio-nebulaflex-pro-access-point-wax630s'},
+ {id:'wax650s',b:'zy',model:'WAX650S',std:'Wi-Fi 6',tag:'AX3600',rate:[1147,2402,0],eirp:[20,23,0],gain:[3,5.8,0],ul:'1× 5 GbE + 1× GbE',poe:null,w:31,dim:[230,235,53.5],shape:'square',wt:1160,mount:'Placa de montagem inclusa',cov:null,cli:null,est:true,url:'https://www.zyxel.com/us/en-us/products/wireless/ax3600-8-stream-wifi-6-dual-radio-nebulaflex-pro-access-point-wax650s/specification'},
+ {id:'nwa130be',b:'zy',model:'NWA130BE',std:'Wi-Fi 7',tag:'BE11000',rate:[688,4324,5765],eirp:[20,23,23],gain:[3,4,4],ul:'2× 2,5 GbE',poe:null,w:24,dim:[250,160,47],shape:'rect',wt:808,mount:'Placa de montagem inclusa',cov:null,cli:null,est:true,url:U_ZY+'be11000-6-stream-wifi-7-triple-radio-nebulaflex-access-point-nwa130be'}
+];
+const DEV=Object.fromEntries(CATALOG.map(d=>[d.id,d]));
+const BANDS=['2,4 GHz','5 GHz','6 GHz'];
+const PL1=[40.2,47.2,48.7], NEXP=[2.6,2.8,2.9], NOISE=-95, CLIENT=[286,1201,1201];
+
+/* ---------- estado ---------- */
+let S=null, SEL=null, TOOL='select', MAT_SEL='alvenaria', ARMED='eap610', BRAND='all';
+let UNDO=[], SUG=null, SPACE=false;
+const V={s:40,ox:20,oy:20};
+const ZMIN=1.2,ZMAX=500;
+
+function sampleState(){
+  const APS=[{id:uid(),dev:'eap610',x:3,y:2.7,h:2.7,pw:0,name:'AP Sala'},{id:uid(),dev:'u6lite',x:11.6,y:7.2,h:2.7,pw:0,name:'AP Quarto'}];
+  const W=[]; const add=(x1,y1,x2,y2,m)=>W.push({id:uid(),x1,y1,x2,y2,m});
+  add(0,0,1.5,0,'alvenaria');add(1.5,0,4.5,0,'vidro');add(4.5,0,14,0,'alvenaria');
+  add(14,0,14,9,'alvenaria');add(14,9,0,9,'alvenaria');add(0,9,0,0,'alvenaria');
+  add(6,0,6,2,'alvenaria');add(6,3,6,5.5,'alvenaria');
+  add(10,0,10,2.2,'concreto');add(10,3.2,10,5.5,'concreto');
+  add(0,5.5,2.5,5.5,'drywall');add(3.5,5.5,6.5,5.5,'drywall');add(7.5,5.5,11,5.5,'drywall');add(12,5.5,14,5.5,'drywall');
+  add(4.5,5.5,4.5,9,'drywall');add(9,5.5,9,9,'drywall');
+  return {meta:{client:'Residência Silva',addr:'',type:'Residência',tech:'',date:new Date().toISOString().slice(0,10)},
+    walls:W,aps:APS,rack:sampleRack(APS[0].id,APS[1].id),
+    pins:[],labels:[{id:uid(),x:3,y:4.6,t:'Sala'},{id:uid(),x:8,y:4.6,t:'Cozinha'},{id:uid(),x:12,y:4.6,t:'Suíte'},{id:uid(),x:2.25,y:8.3,t:'Quarto 1'},{id:uid(),x:6.75,y:8.3,t:'Quarto 2'},{id:uid(),x:11.5,y:8.3,t:'Escritório'}],dims:true,bg:null,calib:0,band:1,sample:true,perUser:25};
+}
+function blankState(){return {meta:{client:'Nova vistoria',addr:'',type:'Residência',tech:'',date:new Date().toISOString().slice(0,10)},walls:[],aps:[],pins:[],labels:[],dims:true,bg:null,calib:0,band:1,sample:false,perUser:25,rack:blankRack()}}
+const snapStr=()=>JSON.stringify({walls:S.walls,aps:S.aps,pins:S.pins,labels:S.labels,calib:S.calib,rack:S.rack});
+function pushUndo(){UNDO.push(snapStr());if(UNDO.length>60)UNDO.shift()}
+function undo(){const u=UNDO.pop();if(!u)return toast('Nada para desfazer');const o=JSON.parse(u);Object.assign(S,o);SEL=null;if(!S.rack)S.rack=blankRack();RK.sel=null;dirty();renderSide();renderRack()}
+let saveT=0;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{const c={...S,bg:null};localStorage.setItem('ondas-v1',JSON.stringify(c))}catch(e){}},400)}
+function load(){try{const t=localStorage.getItem('ondas-v1');if(t){const o=JSON.parse(t);if(o&&Array.isArray(o.walls)&&Array.isArray(o.aps)){const r=Object.assign(blankState(),o,{bg:null});if(!r.rack||!Array.isArray(r.rack.items))r.rack=blankRack();r.rack.custom=r.rack.custom||[];r.rack.link=r.rack.link||{};r.rack.apLink=r.rack.apLink||{};return r}}}catch(e){}return null}
+
+/* ---------- física ---------- */
+let WN=0,WA=new Float32Array(0),WAT=new Float32Array(0);
+function buildWalls(){WN=S.walls.length;WA=new Float32Array(WN*4);WAT=new Float32Array(WN*3);S.walls.forEach((w,i)=>{WA[i*4]=w.x1;WA[i*4+1]=w.y1;WA[i*4+2]=w.x2;WA[i*4+3]=w.y2;const a=MAT[w.m].att;WAT[i*3]=a[0];WAT[i*3+1]=a[1];WAT[i*3+2]=a[2]})}
+function wallLoss(ax,ay,bx,by,bi){
+  let L=0;const d1x=bx-ax,d1y=by-ay;
+  for(let i=0;i<WN;i++){
+    const cx=WA[i*4],cy=WA[i*4+1],d2x=WA[i*4+2]-cx,d2y=WA[i*4+3]-cy;
+    const den=d1x*d2y-d1y*d2x; if(den===0)continue;
+    const t=((cx-ax)*d2y-(cy-ay)*d2x)/den, u=((cx-ax)*d1y-(cy-ay)*d1x)/den;
+    if(t>0&&t<1&&u>=0&&u<1)L+=WAT[i*3+bi];
+  }
+  return L;
+}
+function rssiFrom(a,d,x,y,bi){
+  const dx=x-a.x,dy=y-a.y,dz=a.h-1;let dist=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dist<1)dist=1;
+  return d.eirp[bi]+a.pw-(PL1[bi]+10*NEXP[bi]*Math.log10(dist))-wallLoss(a.x,a.y,x,y,bi)+S.calib;
+}
+function predictAt(x,y,bi,noCal){
+  let best=-120,ap=null;
+  for(const a of S.aps){const d=DEV[a.dev];if(!d||d.rate[bi]<=0)continue;const r=rssiFrom(a,d,x,y,bi);if(r>best){best=r;ap=a}}
+  return {r:noCal?best-S.calib:best,ap};
+}
+function frac(r){
+  const T=[[-50,1],[-55,.88],[-60,.72],[-65,.56],[-70,.4],[-75,.24],[-80,.12],[-85,.05],[-90,0]];
+  if(r>=T[0][0])return 1; for(let i=1;i<T.length;i++){if(r>=T[i][0]){const a=T[i-1],b=T[i];return b[1]+(a[1]-b[1])*(r-b[0])/(a[0]-b[0])}} return 0;
+}
+const STOPS=[[-92,[190,60,60,0]],[-85,[200,70,60,.55]],[-78,[232,136,58,.6]],[-70,[240,201,58,.62]],[-63,[168,214,74,.64]],[-55,[72,200,120,.66]],[-40,[24,160,110,.72]]];
+function col(r){
+  if(r<=STOPS[0][0])return STOPS[0][1];
+  for(let i=1;i<STOPS.length;i++){if(r<=STOPS[i][0]){const a=STOPS[i-1],b=STOPS[i],t=(r-a[0])/(b[0]-a[0]);return a[1].map((v,k)=>v+(b[1][k]-v)*t)}}
+  return STOPS[STOPS.length-1][1];
+}
+function bounds(){
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  for(const w of S.walls){x0=Math.min(x0,w.x1,w.x2);x1=Math.max(x1,w.x1,w.x2);y0=Math.min(y0,w.y1,w.y2);y1=Math.max(y1,w.y1,w.y2)}
+  if(S.bg){x0=Math.min(x0,S.bg.x);y0=Math.min(y0,S.bg.y);x1=Math.max(x1,S.bg.x+S.bg.w*S.bg.scale);y1=Math.max(y1,S.bg.y+S.bg.h*S.bg.scale)}
+  for(const a of S.aps){x0=Math.min(x0,a.x);x1=Math.max(x1,a.x);y0=Math.min(y0,a.y);y1=Math.max(y1,a.y)}
+  if(!isFinite(x0)){x0=0;y0=0;x1=14;y1=9}
+  if(x1-x0<3){x1=x0+3} if(y1-y0<3){y1=y0+3}
+  return {x0,y0,x1,y1};
+}
+let HEAT=null, heatDirty=true;
+function computeHeat(){
+  buildWalls();
+  const b=bounds(),m=1.5,X0=b.x0-m,Y0=b.y0-m,X1=b.x1+m,Y1=b.y1+m;
+  const res=Math.max(.15,Math.sqrt((X1-X0)*(Y1-Y0)/16000));
+  const gw=Math.ceil((X1-X0)/res),gh=Math.ceil((Y1-Y0)/res),bi=S.band;
+  const aps=S.aps.map(a=>({a,d:DEV[a.dev]})).filter(o=>o.d&&o.d.rate[bi]>0);
+  const off=document.createElement('canvas');off.width=gw;off.height=gh;
+  const octx=off.getContext('2d'),img=octx.createImageData(gw,gh);
+  let tot=0,good=0,ok=0;
+  for(let j=0;j<gh;j++){const py=Y0+(j+.5)*res;
+    for(let i=0;i<gw;i++){const px=X0+(i+.5)*res;let best=-120;
+      for(const o of aps){const r=rssiFrom(o.a,o.d,px,py,bi);if(r>best)best=r}
+      const inside=px>=b.x0&&px<=b.x1&&py>=b.y0&&py<=b.y1;
+      if(inside){tot++;if(best>=-67)good++;if(best>=-72)ok++}
+      if(aps.length){const c=col(best),k=(j*gw+i)*4;img.data[k]=c[0];img.data[k+1]=c[1];img.data[k+2]=c[2];img.data[k+3]=Math.round(c[3]*255)}
+    }}
+  octx.putImageData(img,0,0);
+  HEAT={X0,Y0,gw,gh,res,off,tot,good,ok,n:aps.length};heatDirty=false;
+}
+
+/* ---------- canvas ---------- */
+const stage=$('#stage'),cv=$('#cv'),ctx=cv.getContext('2d'),ov=$('#ov');
+let CW=0,CH=0,DPR=1,fitted=false,COL={line:'rgba(0,0,0,.1)',strong:'rgba(0,0,0,.2)'};
+function readColors(){const cs=getComputedStyle(document.documentElement);COL.line=cs.getPropertyValue('--line').trim()||COL.line;COL.strong=cs.getPropertyValue('--line-strong').trim()||COL.strong;COL.wall=cs.getPropertyValue('--mat-alvenaria').trim();COL.halo=cs.getPropertyValue('--halo').trim();COL.fg=cs.getPropertyValue('--fg').trim()}
+function resize(){
+  const r=stage.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);
+  CW=Math.max(1,Math.round(r.width));CH=Math.max(1,Math.round(r.height));
+  cv.width=CW*DPR;cv.height=CH*DPR;ov.setAttribute('viewBox',`0 0 ${CW} ${CH}`);
+  if(!fitted&&CW>50){fit();fitted=true}
+  scheduleRender();
+}
+function fitView(W,H,b,pad){const bw=b.x1-b.x0,bh=b.y1-b.y0,s=Math.min((W-2*pad)/bw,(H-2*pad)/bh);return {s,ox:(W-bw*s)/2-b.x0*s,oy:(H-bh*s)/2-b.y0*s}}
+function fit(){const b=bounds();const top=CW<600?118:104,bot=CW<600?96:92;const f=fitView(CW,Math.max(120,CH-top-bot),b,28);f.s=clamp(f.s,ZMIN,ZMAX);f.oy+=top;Object.assign(V,f);scheduleRender()}
+function drawScene(c,W,H,v,vec){
+  c.clearRect(0,0,W,H);
+  const x0=-v.ox/v.s,y0=-v.oy/v.s,x1=(W-v.ox)/v.s,y1=(H-v.oy)/v.s;
+  if(!vec){
+    const st=v.s>=14?1:v.s>=5?5:v.s>=2?10:20,mj=st===1?5:st*2;c.lineWidth=1;
+    for(let x=Math.floor(x0/st)*st;x<=x1;x+=st){c.strokeStyle=x%mj===0?COL.strong:COL.line;c.beginPath();c.moveTo(Math.round(x*v.s+v.ox)+.5,0);c.lineTo(Math.round(x*v.s+v.ox)+.5,H);c.stroke()}
+    for(let y=Math.floor(y0/st)*st;y<=y1;y+=st){c.strokeStyle=y%mj===0?COL.strong:COL.line;c.beginPath();c.moveTo(0,Math.round(y*v.s+v.oy)+.5);c.lineTo(W,Math.round(y*v.s+v.oy)+.5);c.stroke()}
+  }
+  if(S.bg&&S.bg.img){c.globalAlpha=.92;c.drawImage(S.bg.img,S.bg.x*v.s+v.ox,S.bg.y*v.s+v.oy,S.bg.w*S.bg.scale*v.s,S.bg.h*S.bg.scale*v.s);c.globalAlpha=1}
+  if(HEAT&&HEAT.n){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(HEAT.off,HEAT.X0*v.s+v.ox,HEAT.Y0*v.s+v.oy,HEAT.gw*HEAT.res*v.s,HEAT.gh*HEAT.res*v.s)}
+  if(vec){
+    for(const w of S.walls){c.lineCap='round';c.strokeStyle=COL.halo;c.lineWidth=MAT[w.m].th+3;c.beginPath();c.moveTo(w.x1*v.s+v.ox,w.y1*v.s+v.oy);c.lineTo(w.x2*v.s+v.ox,w.y2*v.s+v.oy);c.stroke();
+      c.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--mat-'+w.m).trim()||'#333';c.lineWidth=MAT[w.m].th;c.stroke()}
+    for(const a of S.aps){const d=DEV[a.dev],x=a.x*v.s+v.ox,y=a.y*v.s+v.oy;c.fillStyle='#fff';c.strokeStyle=BRANDS[d.b].c;c.lineWidth=3;c.beginPath();c.arc(x,y,11,0,7);c.fill();c.stroke();
+      c.fillStyle='#222';c.font='600 11px system-ui,sans-serif';c.textAlign='center';c.lineWidth=3;c.strokeStyle=COL.halo;c.strokeText(a.name,x,y+26);c.fillText(a.name,x,y+26)}
+    for(const l of S.labels){const fs=Math.max(11,Math.min(17,v.s*.42));c.font='700 '+fs+'px system-ui,sans-serif';c.textAlign='center';c.lineWidth=4;c.strokeStyle=COL.halo;c.strokeText(l.t,l.x*v.s+v.ox,l.y*v.s+v.oy+4);c.fillStyle=COL.fg||'#222';c.fillText(l.t,l.x*v.s+v.ox,l.y*v.s+v.oy+4)}
+    for(const p of S.pins){const x=p.x*v.s+v.ox,y=p.y*v.s+v.oy;c.fillStyle='#222';c.beginPath();c.moveTo(x,y-9);c.lineTo(x+7,y);c.lineTo(x,y+9);c.lineTo(x-7,y);c.closePath();c.fill();
+      if(p.rssi!=null){c.font='600 11px ui-monospace,monospace';c.textAlign='center';c.lineWidth=3;c.strokeStyle=COL.halo;c.strokeText(p.rssi+' dBm',x,y-14);c.fillStyle='#222';c.fillText(p.rssi+' dBm',x,y-14)}}
+  }
+}
+function drawMain(){ctx.setTransform(DPR,0,0,DPR,0,0);drawScene(ctx,CW,CH,V,false)}
+
+/* ---------- sobreposição SVG ---------- */
+const X=x=>x*V.s+V.ox, Y=y=>y*V.s+V.oy;
+let DR={start:null,cur:null,room:null,scale:null};
+function wifiGlyph(){return '<path d="M-7 -2a10 10 0 0114 0M-4.5 1a6.4 6.4 0 019 0M-2 3.6a2.8 2.8 0 014 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" transform="translate(0,-1)"/><circle cx="0" cy="6" r="1.3" fill="currentColor"/>'}
+function renderOverlay(){
+  let h='';
+  for(const w of S.walls){
+    const sel=inSel('w',w.id),th=MAT[w.m].th,x1=X(w.x1),y1=Y(w.y1),x2=X(w.x2),y2=Y(w.y2);
+    h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--halo)" stroke-width="${th+3}" stroke-linecap="round"/>`;
+    if(sel)h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--accent)" stroke-width="${th+8}" stroke-linecap="round" opacity=".85"/>`;
+    h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--mat-${w.m})" stroke-width="${th}" stroke-linecap="round"/>`;
+  }
+  if(S.dims){for(const w of S.walls){
+    const L=Math.hypot(w.x2-w.x1,w.y2-w.y1);if(L*V.s<46)continue;
+    const dx=X(w.x2)-X(w.x1),dy=Y(w.y2)-Y(w.y1),n=Math.hypot(dx,dy)||1;let ox=-dy/n*11,oy=dx/n*11;if(oy>0){ox=-ox;oy=-oy}
+    h+=lbl((X(w.x1)+X(w.x2))/2+ox,(Y(w.y1)+Y(w.y2))/2+oy+4,nf(L,2)+' m',10)}}
+  if(TOOL==='select'){
+    const seen=new Set();
+    for(const w of S.walls)for(const k of ['1','2']){const x=w['x'+k],y=w['y'+k],key=Math.round(x*50)+','+Math.round(y*50);if(seen.has(key))continue;seen.add(key);h+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4" fill="var(--glass-2)" stroke="var(--fg-2)" stroke-width="1.5"/>`}
+    if(SEL&&SEL.t==='w'){const w=S.walls.find(o=>o.id===SEL.id);if(w)for(const k of ['1','2'])h+=`<circle cx="${X(w['x'+k])}" cy="${Y(w['y'+k])}" r="6.5" fill="var(--accent)" stroke="var(--accent-ink)" stroke-width="2"/>`}
+  }
+  for(const l of S.labels){
+    const fs=labFs(),sel=inSel('l',l.id);
+    h+=`<text x="${X(l.x)}" y="${Y(l.y)+4}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="var(--fg)" stroke="var(--halo)" stroke-width="4" paint-order="stroke" style="font-family:var(--font-ui);letter-spacing:.02em">${esc(l.t)}</text>`;
+    if(sel){const w=labW(l);h+=`<rect x="${X(l.x)-w/2}" y="${Y(l.y)-fs/2-6}" width="${w}" height="${fs+12}" rx="8" fill="none" stroke="var(--accent-ink)" stroke-width="2" stroke-dasharray="4 3"/>`}
+  }
+  if(TOOL==='wall'&&DR.start){const a=DR.start,b=DR.cur||a;const len=Math.hypot(b.x-a.x,b.y-a.y);
+    h+=`<line x1="${X(a.x)}" y1="${Y(a.y)}" x2="${X(b.x)}" y2="${Y(b.y)}" stroke="var(--accent-ink)" stroke-width="3" stroke-dasharray="6 5" stroke-linecap="round"/><circle cx="${X(a.x)}" cy="${Y(a.y)}" r="4" fill="var(--accent-ink)"/>`;
+    h+=lbl((X(a.x)+X(b.x))/2,(Y(a.y)+Y(b.y))/2-10,nf(len,2)+' m')}
+  if(TOOL==='room'&&DR.room){const a=DR.room.a,b=DR.room.b;h+=`<rect x="${X(Math.min(a.x,b.x))}" y="${Y(Math.min(a.y,b.y))}" width="${Math.abs(b.x-a.x)*V.s}" height="${Math.abs(b.y-a.y)*V.s}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent-ink)" stroke-width="2.5" stroke-dasharray="6 5"/>`;
+    h+=lbl(X((a.x+b.x)/2),Y((a.y+b.y)/2),nf(Math.abs(b.x-a.x),2)+' × '+nf(Math.abs(b.y-a.y),2)+' m')}
+  if(DR.marq){const a=DR.marq.a,b=DR.marq.b;h+=`<rect x="${X(Math.min(a.x,b.x))}" y="${Y(Math.min(a.y,b.y))}" width="${Math.abs(b.x-a.x)*V.s}" height="${Math.abs(b.y-a.y)*V.s}" fill="var(--accent)" fill-opacity=".14" stroke="var(--accent-ink)" stroke-width="2" stroke-dasharray="5 4"/>`}
+  if(TOOL==='scale'&&DR.scale){const a=DR.scale.a,b=DR.scale.b||DR.scale.cur||a;h+=`<line x1="${X(a.x)}" y1="${Y(a.y)}" x2="${X(b.x)}" y2="${Y(b.y)}" stroke="var(--accent-ink)" stroke-width="3"/><circle cx="${X(a.x)}" cy="${Y(a.y)}" r="5" fill="var(--accent-ink)"/><circle cx="${X(b.x)}" cy="${Y(b.y)}" r="5" fill="var(--accent-ink)"/>`}
+  if(TOOL==='tape'&&DR.tape){const a=DR.tape.a,b=DR.tape.b||DR.tape.cur||a,len=Math.hypot(b.x-a.x,b.y-a.y);h+=`<line x1="${X(a.x)}" y1="${Y(a.y)}" x2="${X(b.x)}" y2="${Y(b.y)}" stroke="var(--accent-ink)" stroke-width="3"/><circle cx="${X(a.x)}" cy="${Y(a.y)}" r="5" fill="var(--accent-ink)"/><circle cx="${X(b.x)}" cy="${Y(b.y)}" r="5" fill="var(--accent-ink)"/>`+lbl((X(a.x)+X(b.x))/2,(Y(a.y)+Y(b.y))/2-10,nf(len,2)+' m',13)}
+  if(SUG){h+=`<g class="pulse" transform="translate(${X(SUG.x)},${Y(SUG.y)})"><circle r="24" fill="var(--accent)" fill-opacity=".25" stroke="var(--accent-ink)" stroke-width="2.5" stroke-dasharray="5 4"/><g style="color:var(--accent-ink)">${wifiGlyph()}</g></g>`+lbl(X(SUG.x),Y(SUG.y)-34,'Sugestão +'+nf(SUG.gain,0)+' %')}
+  for(const p of S.pins){
+    const sel=inSel('pin',p.id),pr=predictAt(p.x,p.y,p.band,false);let c='var(--fg-2)';
+    if(p.rssi!=null&&pr.r>-120){const dl=Math.abs(p.rssi-pr.r);c=dl<=3?'var(--ok)':dl<=6?'var(--warn)':'var(--bad)'}
+    h+=`<g transform="translate(${X(p.x)},${Y(p.y)})">${sel?'<circle r="17" fill="none" stroke="var(--accent-ink)" stroke-width="2.5" stroke-dasharray="4 3"/>':''}<path d="M0 -10L8 0L0 10L-8 0Z" fill="${c}" stroke="var(--halo)" stroke-width="2.5" paint-order="stroke"/></g>`;
+    h+=lbl(X(p.x),Y(p.y)-20,esc(p.name)+(p.rssi!=null?' · '+p.rssi+' dBm':''));
+  }
+  for(const a of S.aps){
+    const d=DEV[a.dev],sel=inSel('ap',a.id);
+    h+=`<g transform="translate(${X(a.x)},${Y(a.y)})" style="color:var(--fg)">`;
+    if(sel)h+=`<circle r="23" fill="none" stroke="var(--accent-ink)" stroke-width="2.5" stroke-dasharray="4 3"/>`;
+    h+=`<circle r="16" fill="var(--glass-2)" stroke="${BRANDS[d.b].c}" stroke-width="3.5"/>${wifiGlyph()}</g>`;
+    h+=lbl(X(a.x),Y(a.y)+34,esc(a.name));
+  }
+  ov.innerHTML=h;
+  renderScalebar();
+}
+function lbl(x,y,t,fs){return `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fs||11.5}" font-weight="700" fill="var(--fg)" stroke="var(--halo)" stroke-width="3.5" paint-order="stroke" style="font-family:var(--font-ui)">${t}</text>`}
+function renderScalebar(){
+  const opts=[.5,1,2,5,10,20,50,100,200,500];const m=opts.find(o=>o*V.s>=60)||opts[opts.length-1];
+  $('#scalebar').innerHTML=`<span>${nf(m,m<1?1:0)} m</span><i style="width:${m*V.s}px"></i>`;
+}
+
+/* ---------- render loop ---------- */
+let raf=0;
+function scheduleRender(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(!S)return;if(heatDirty){computeHeat();renderStats()}drawMain();renderOverlay()})}
+function dirty(){heatDirty=true;SUG=null;if($('#sugBox'))$('#sugBox').innerHTML='';scheduleRender();save();updateExChip()}
+function updateExChip(){$('#exChip').hidden=!S.sample}
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{el.hidden=true},3200)}
+
+/* ---------- indicadores ---------- */
+function renderStats(){
+  const bi=S.band,h=HEAT,pc=h&&h.tot&&h.n?Math.round(100*h.good/h.tot):0,pok=h&&h.tot&&h.n?Math.round(100*h.ok/h.tot):0;
+  const C=2*Math.PI*40;
+  $('#sCov').innerHTML=`<svg class="ring" viewBox="0 0 100 100" role="img" aria-label="${pc}% de cobertura"><circle class="tr" cx="50" cy="50" r="40"/><circle class="vl" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pc/100)}"/><text x="50" y="57" text-anchor="middle">${pc}%</text></svg>
+   <div><h3 style="margin-bottom:6px">Cobertura ${BANDS[bi]}</h3><div class="muted" style="font-size:13px">Área com sinal ≥ −67 dBm</div><p>${pok}% da área tem ≥ −72 dBm (uso básico).</p></div>`;
+  let watts=0,r5=0;for(const a of S.aps){const d=DEV[a.dev];watts+=d.w||0;r5+=(d.rate[1]||d.rate[0])*.45}
+  $('#sAps').innerHTML=`<div><h3 style="margin-bottom:6px">Pontos de acesso</h3><div class="big">${S.aps.length}<small>${S.aps.length===1?'AP':'APs'}</small></div><p>PoE somado: <b class="mono">${nf(watts,1)} W</b>. Switch com pelo menos <b class="mono">${nf(Math.ceil(watts*1.2),0)} W</b> de orçamento PoE e ${S.aps.length} porta${S.aps.length===1?'':'s'}.</p></div>`;
+  const users=Math.floor(r5/Math.max(1,S.perUser));
+  $('#sCap').innerHTML=`<div><h3 style="margin-bottom:6px">Capacidade estimada</h3><div class="big">${users}<small>usuários simultâneos</small></div><div class="inl"><label for="perUser">Mbps por usuário</label><input id="perUser" type="number" min="1" max="1000" value="${S.perUser}"></div></div>`;
+  const pu=$('#perUser');if(pu)pu.addEventListener('change',()=>{S.perUser=clamp(+pu.value||25,1,1000);save();renderStats()});
+  $$('#bandSeg button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.band===S.band)));
+  renderMeasCard();
+}
+
+/* ---------- desenho do equipamento em escala ---------- */
+let GID=0;
+function deviceSvg(d,k=.5,card=true){
+  const [w,h,t]=d.dim,pw=w*k,ph=h*k,cx=100,cy=76,id='g'+(++GID);
+  let shape='';
+  const fill=`url(#${id})`;
+  if(d.shape==='round')shape=`<circle cx="${cx}" cy="${cy}" r="${pw/2}" fill="${fill}" stroke="var(--line-strong)"/><circle cx="${cx}" cy="${cy}" r="${pw/2*.74}" fill="none" stroke="var(--line)"/>`;
+  else shape=`<rect x="${cx-pw/2}" y="${cy-ph/2}" width="${pw}" height="${ph}" rx="${Math.min(pw,ph)*(d.shape==='rect'?.14:.18)}" fill="${fill}" stroke="var(--line-strong)"/><rect x="${cx-pw/2+pw*.1}" y="${cy-ph/2+ph*.1}" width="${pw*.8}" height="${ph*.8}" rx="${Math.min(pw,ph)*.12}" fill="none" stroke="var(--line)"/>`;
+  const dimTxt=d.shape==='round'?`⌀${nf(w,0)} mm`:`${nf(w,w%1?1:0)} × ${nf(h,h%1?1:0)} mm`;
+  const cw=85.6*k,ch=54*k;
+  return `<svg viewBox="0 0 250 168" width="250" height="168" role="img" aria-label="${esc(d.model)}: ${dimTxt}, espessura ${nf(t,1)} mm">
+   <defs><radialGradient id="${id}" cx=".32" cy=".28" r=".95"><stop offset="0" style="stop-color:var(--dev-hi)"/><stop offset="1" style="stop-color:var(--dev-lo)"/></radialGradient></defs>
+   <ellipse cx="${cx}" cy="${cy+ph/2+3}" rx="${pw/2*.85}" ry="4" fill="#000" opacity=".12"/>
+   ${shape}<circle cx="${cx}" cy="${cy}" r="2.6" fill="var(--accent)" stroke="var(--accent-ink)" stroke-width=".6"/>
+   <text x="${cx}" y="150" text-anchor="middle" font-size="11" style="font-family:var(--font-mono);fill:var(--fg-2)">${dimTxt} · esp. ${nf(t,1)} mm</text>
+   ${card?`<rect x="${250-cw-6}" y="${cy+ph/2-ch}" width="${cw}" height="${ch}" rx="3" fill="none" stroke="var(--fg-3)" stroke-dasharray="3 2"/><text x="${250-cw/2-6}" y="${cy+ph/2+10}" text-anchor="middle" font-size="8.5" style="font-family:var(--font-ui);fill:var(--fg-3)">cartão</text>`:''}
+  </svg>`;
+}
+const eirpTxt=d=>d.eirp.map((v,i)=>d.rate[i]>0?nf(v,v%1?1:0):'—').join(' / ');
+const rateTxt=d=>d.rate.map(v=>v>0?nf(v,v%1?1:0):'—').join(' / ');
+
+/* ---------- lateral: adicionar, inspetor, materiais, medições ---------- */
+function fillSelDev(){
+  const sel=$('#selDev');let h='';
+  for(const b of Object.keys(BRANDS)){if(BRAND!=='all'&&BRAND!==b)continue;h+=`<optgroup label="${BRANDS[b].n} ${BRANDS[b].line}">`+CATALOG.filter(d=>d.b===b).map(d=>`<option value="${d.id}">${esc(d.model)} · ${d.std}</option>`).join('')+'</optgroup>'}
+  sel.innerHTML=h;if(!DEV[ARMED]||(BRAND!=='all'&&DEV[ARMED].b!==BRAND))ARMED=sel.options[0].value;sel.value=ARMED;miniDev();
+  $$('#brandSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.b===BRAND)));
+}
+function miniDev(){const d=DEV[ARMED];$('#devMini').textContent=`${d.std}${d.tag?' '+d.tag:''} · EIRP ${eirpTxt(d)} dBm · ${d.shape==='round'?'⌀'+d.dim[0]:d.dim[0]+'×'+d.dim[1]} mm · ${d.w?nf(d.w,1)+' W PoE':'PoE n/c'}`}
+function renderMats(){
+  $('#mats').innerHTML=Object.entries(MAT).map(([k,m])=>`<button class="mat" data-mat="${k}" aria-pressed="${k===MAT_SEL}"><i style="background:var(--mat-${k});height:${Math.max(3,m.th)}px"></i><span>${m.n}</span><small>−${m.att.join(' / −')} dB</small></button>`).join('');
+}
+function selObj(){if(!SEL||SEL.t==='multi')return null;return listOf(SEL.t).find(o=>o.id===SEL.id)||null}
+function renderInspector(){
+  const el=$('#cInsp');
+  if(SEL&&SEL.t==='multi'){
+    const n=SEL.w.size+SEL.a.size+SEL.p.size+SEL.l.size;
+    el.innerHTML=`<h3>Seleção múltipla</h3><p style="margin:0;font-size:13px"><b>${n}</b> itens: ${SEL.w.size} paredes, ${SEL.a.size} APs, ${SEL.p.size} pontos, ${SEL.l.size} nomes.</p><p class="hint">Arraste qualquer item selecionado para mover tudo, ou use as setas do teclado (Shift para passos de 0,5 m).</p><div class="btnrow"><button class="btn danger" data-act="del">${ic('trash')}Excluir seleção</button></div>`;return}
+  const o=selObj();
+  if(!o){el.innerHTML=`<h3>Seleção</h3><p class="hint" style="margin:0">Clique num AP, parede ou ponto de medição para editar. Arraste uma parede ou uma ponta para reformar o cômodo, as paredes ligadas acompanham. Shift + arrastar seleciona vários itens, Ctrl+A seleciona tudo. A roda do mouse aproxima ou afasta, e arrastar o fundo desloca a planta.</p>`;return}
+  if(SEL.t==='ap'){
+    const d=DEV[o.dev];
+    el.innerHTML=`<h3>Ponto de acesso</h3><div class="dev-fig">${deviceSvg(d,.5,false)}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:16px">${esc(d.model)}</b><span class="tag" style="color:${BRANDS[d.b].c};border-color:${BRANDS[d.b].c}">${BRANDS[d.b].n}</span></div>
+    <div class="muted" style="font-size:12.5px">${d.std}${d.tag?' · '+d.tag:''} · ${d.mount}</div>
+    <div class="field"><label for="apName">Nome</label><input id="apName" type="text" value="${esc(o.name)}" maxlength="30"></div>
+    <div class="field"><label for="apDev">Modelo</label><select id="apDev">${CATALOG.map(c=>`<option value="${c.id}"${c.id===o.dev?' selected':''}>${BRANDS[c.b].n} ${esc(c.model)}</option>`).join('')}</select></div>
+    <div class="field"><label for="apH">Altura de instalação <b id="apHv">${nf(o.h,1)} m</b></label><input id="apH" type="range" min="1.8" max="4.5" step=".1" value="${o.h}"></div>
+    <div class="field"><label for="apP">Potência (redução) <b id="apPv">${o.pw} dB</b></label><input id="apP" type="range" min="-12" max="0" step="1" value="${o.pw}"></div>
+    <p class="hint" id="apE">EIRP efetiva: ${d.eirp.map((v,i)=>d.rate[i]>0?BANDS[i]+' '+nf(v+o.pw,1):'').filter(Boolean).join(' · ')} dBm</p>
+    <div class="btnrow"><button class="btn" data-act="dup">${ic('dup')}Duplicar</button><button class="btn danger" data-act="del">${ic('trash')}Remover</button></div>`;
+  }else if(SEL.t==='w'){
+    const len=Math.hypot(o.x2-o.x1,o.y2-o.y1);
+    el.innerHTML=`<h3>Parede</h3><div class="field"><label for="wMat">Material</label><select id="wMat">${Object.entries(MAT).map(([k,m])=>`<option value="${k}"${k===o.m?' selected':''}>${m.n}</option>`).join('')}</select></div>
+    <div class="field"><label for="wLen">Comprimento (m)</label><input id="wLen" type="number" min="0.1" step="0.01" value="${len.toFixed(2)}"></div>
+    <p class="hint">Perda: ${MAT[o.m].att.map((v,i)=>BANDS[i]+' −'+v).join(' · ')} dB. Arraste a parede ou as pontas na planta.</p>
+    <div class="btnrow"><button class="btn" data-act="split">Dividir ao meio</button><button class="btn danger" data-act="del">${ic('trash')}Remover</button></div>`;
+  }else if(SEL.t==='l'){
+    el.innerHTML=`<h3>Nome do ambiente</h3><div class="field"><label for="lText">Texto</label><input id="lText" type="text" value="${esc(o.t)}" maxlength="30"></div>
+    <div class="btnrow"><button class="btn danger" data-act="del">${ic('trash')}Remover</button></div>`;
+  }else{
+    const pr=predictAt(o.x,o.y,o.band,false);
+    const dl=o.rssi!=null&&pr.r>-120?o.rssi-pr.r:null;
+    el.innerHTML=`<h3>Ponto de medição</h3>
+    <div class="field"><label for="pName">Nome</label><input id="pName" type="text" value="${esc(o.name)}" maxlength="30"></div>
+    <div class="row2"><div class="field"><label for="pBand">Banda</label><select id="pBand">${BANDS.map((b,i)=>`<option value="${i}"${i===o.band?' selected':''}>${b}</option>`).join('')}</select></div>
+    <div class="field"><label for="pRssi">Sinal medido (dBm)</label><input id="pRssi" type="number" min="-110" max="-10" step="1" value="${o.rssi??''}" placeholder="−60"></div></div>
+    <div class="row2"><div class="field"><label for="pDown">Download (Mbps)</label><input id="pDown" type="number" min="0" step="1" value="${o.down??''}"></div>
+    <div class="field"><label for="pUp">Upload (Mbps)</label><input id="pUp" type="number" min="0" step="1" value="${o.up??''}"></div></div>
+    <div class="field"><label for="pPing">Latência (ms)</label><input id="pPing" type="number" min="0" step="1" value="${o.ping??''}"></div>
+    <p class="hint">Previsto pelo modelo: <b class="mono">${pr.r>-120?nf(pr.r,0)+' dBm':'sem AP nesta banda'}</b>${dl!=null?` · diferença <b class="mono ${Math.abs(dl)<=3?'delta-ok':Math.abs(dl)<=6?'delta-warn':'delta-bad'}">${dl>0?'+':''}${nf(dl,0)} dB</b>`:''}</p>
+    <div class="btnrow"><button class="btn danger" data-act="del">${ic('trash')}Remover ponto</button></div>`;
+  }
+}
+function renderMeasCard(){
+  const el=$('#cMeas');if(!el)return;
+  const ms=S.pins.filter(p=>p.rssi!=null);
+  let h=`<h3>Medições e calibração</h3>`;
+  if(!S.pins.length)h+=`<p class="hint" style="margin:0">Use a ferramenta Medição, toque num ponto da planta e informe o sinal medido com um celular ou analisador. O modelo compara com a previsão e se ajusta.</p>`;
+  else h+=`<div class="plist">`+S.pins.map(p=>{const pr=predictAt(p.x,p.y,p.band,false);const dl=p.rssi!=null&&pr.r>-120?p.rssi-pr.r:null;return `<button class="pitem" data-pin="${p.id}"><span>${esc(p.name)} <span class="muted">${BANDS[p.band]}</span></span><span class="mono">${p.rssi!=null?p.rssi+' dBm':'—'}${dl!=null?` <span class="${Math.abs(dl)<=3?'delta-ok':Math.abs(dl)<=6?'delta-warn':'delta-bad'}">(${dl>0?'+':''}${nf(dl,0)})</span>`:''}</span></button>`}).join('')+`</div>`;
+  if(ms.length){
+    let sum=0,n=0;for(const p of ms){const pr=predictAt(p.x,p.y,p.band,true);if(pr.r>-120){sum+=p.rssi-pr.r;n++}}
+    if(n){const adj=Math.round(sum/n*10)/10;h+=`<div class="btnrow"><button class="btn primary" data-act="calib" data-v="${adj}">Ajustar modelo (${adj>0?'+':''}${nf(adj,1)} dB)</button>${S.calib?`<button class="btn" data-act="calibReset">Zerar ajuste</button>`:''}</div><p class="hint">Ajuste atual: <b class="mono">${S.calib>0?'+':''}${nf(S.calib,1)} dB</b>. A média das diferenças corrige o mapa inteiro.</p>`}
+  }
+  el.innerHTML=h;
+}
+function renderSide(){renderInspector();renderMeasCard();renderMats();const bd=$('#btnDims');if(bd)bd.setAttribute('aria-pressed',String(!!S.dims))}
+
+/* ---------- sugestão de posição ---------- */
+function suggest(){
+  buildWalls();const b=bounds(),d=DEV[ARMED];let bi=S.band;if(d.rate[bi]<=0)bi=d.rate[1]>0?1:0;
+  const st=.5,cells=[];for(let y=b.y0+st/2;y<b.y1;y+=st)for(let x=b.x0+st/2;x<b.x1;x+=st)cells.push([x,y]);
+  const base=cells.map(([x,y])=>predictAt(x,y,bi,false).r);
+  let best=null,bg=0;
+  for(let cy=b.y0+.5;cy<b.y1-.2;cy+=st)for(let cx=b.x0+.5;cx<b.x1-.2;cx+=st){
+    const a={x:cx,y:cy,h:2.7,pw:0};let g=0;
+    for(let i=0;i<cells.length;i++){if(base[i]<-67){const r=rssiFrom(a,d,cells[i][0],cells[i][1],bi);if(r>=-67)g++}}
+    if(g>bg){bg=g;best={x:cx,y:cy,gain:100*g/cells.length,dev:ARMED}}
+  }
+  return best;
+}
+
+/* ---------- interação ---------- */
+const PTR=new Map();let D=null,G=null;
+function toWorld(e){const r=ov.getBoundingClientRect();return {x:(e.clientX-r.left-V.ox)/V.s,y:(e.clientY-r.top-V.oy)/V.s,px:e.clientX-r.left,py:e.clientY-r.top}}
+const r05=v=>Math.round(v*20)/20;
+const labFs=()=>Math.max(11,Math.min(17,V.s*.42));
+const labW=l=>Math.max(40,l.t.length*labFs()*.6)+12;
+const listOf=t=>t==='ap'?S.aps:t==='w'?S.walls:t==='pin'?S.pins:S.labels;
+function inSel(t,id){if(!SEL)return false;if(SEL.t===t&&SEL.id===id)return true;return SEL.t==='multi'&&SEL[t==='w'?'w':t==='ap'?'a':t==='pin'?'p':'l'].has(id)}
+function snapPt(p,from,skip){
+  let x=r05(p.x),y=r05(p.y),bd=.25;
+  for(const w of S.walls)for(const k of ['1','2']){
+    if(skip&&skip.has(w.id+k))continue;
+    const ex=w['x'+k],ey=w['y'+k],dd=Math.hypot(ex-p.x,ey-p.y);
+    if(dd<bd){bd=dd;x=ex;y=ey}
+  }
+  if(from&&bd===.25){if(Math.abs(x-from.x)<.15)x=from.x;if(Math.abs(y-from.y)<.15)y=from.y}
+  return {x,y};
+}
+function distSeg(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;let t=l?((px-ax)*dx+(py-ay)*dy)/l:0;t=clamp(t,0,1);return Math.hypot(px-(ax+t*dx),py-(ay+t*dy))}
+function hitAp(p){for(const a of S.aps)if(Math.hypot(X(a.x)-p.px,Y(a.y)-p.py)<22)return a;return null}
+function hitPin(p){for(const a of S.pins)if(Math.hypot(X(a.x)-p.px,Y(a.y)-p.py)<16)return a;return null}
+function hitLabel(p){for(const l of S.labels){if(Math.abs(X(l.x)-p.px)<labW(l)/2&&Math.abs(Y(l.y)-p.py)<labFs()/2+7)return l}return null}
+function hitVtx(p){let b=null,bd=11;for(const w of S.walls)for(const k of ['1','2']){const d=Math.hypot(X(w['x'+k])-p.px,Y(w['y'+k])-p.py);if(d<bd){bd=d;b={x:w['x'+k],y:w['y'+k]}}}return b}
+function hitWall(p){let b=null,bd=9;for(const w of S.walls){const d=distSeg(p.px,p.py,X(w.x1),Y(w.y1),X(w.x2),Y(w.y2));if(d<bd){bd=d;b=w}}return b}
+function gather(x,y){const o=[];for(const w of S.walls)for(const k of ['1','2'])if(Math.hypot(w['x'+k]-x,w['y'+k]-y)<.03)o.push({w,k});return o}
+function uniqEnds(a){const m=new Map();a.forEach(e=>m.set(e.w.id+e.k,e));return [...m.values()]}
+function shiftEnds(list,dx,dy){list.forEach(e=>{e.w['x'+e.k]+=dx;e.w['y'+e.k]+=dy})}
+function addWall(x1,y1,x2,y2,m){if(Math.hypot(x2-x1,y2-y1)<.05)return;S.walls.push({id:uid(),x1,y1,x2,y2,m})}
+function translateSel(dx,dy){
+  if(!SEL)return;
+  if(SEL.t==='multi'){
+    S.walls.forEach(w=>{if(SEL.w.has(w.id)){w.x1+=dx;w.x2+=dx;w.y1+=dy;w.y2+=dy}});
+    [['a',S.aps],['p',S.pins],['l',S.labels]].forEach(([k,L])=>L.forEach(o=>{if(SEL[k].has(o.id)){o.x+=dx;o.y+=dy}}));
+  }else{
+    const o=selObj();if(!o)return;
+    if(SEL.t==='w')shiftEnds(uniqEnds([...gather(o.x1,o.y1),...gather(o.x2,o.y2)]),dx,dy);else{o.x+=dx;o.y+=dy}
+  }
+  heatDirty=true;SUG=null;
+}
+function delSel(){
+  if(!SEL)return;pushUndo();
+  if(SEL.t==='multi'){S.walls=S.walls.filter(w=>!SEL.w.has(w.id));S.aps=S.aps.filter(o=>!SEL.a.has(o.id));S.pins=S.pins.filter(o=>!SEL.p.has(o.id));S.labels=S.labels.filter(o=>!SEL.l.has(o.id))}
+  else{const L=listOf(SEL.t),o=selObj();if(o)L.splice(L.indexOf(o),1)}
+  SEL=null;dirty();renderSide();
+}
+function setWallLen(w,L){
+  if(!(L>=.05))return;const dx=w.x2-w.x1,dy=w.y2-w.y1,cur=Math.hypot(dx,dy);if(cur<1e-6)return;
+  pushUndo();const nx=w.x1+dx/cur*L,ny=w.y1+dy/cur*L;
+  gather(w.x2,w.y2).forEach(e=>{e.w['x'+e.k]=nx;e.w['y'+e.k]=ny});dirty();renderInspector();
+}
+function splitWall(w){
+  pushUndo();const mx=(w.x1+w.x2)/2,my=(w.y1+w.y2)/2;
+  const a={id:uid(),x1:w.x1,y1:w.y1,x2:mx,y2:my,m:w.m},b={id:uid(),x1:mx,y1:my,x2:w.x2,y2:w.y2,m:w.m};
+  S.walls.splice(S.walls.indexOf(w),1,a,b);SEL={t:'w',id:a.id};dirty();renderSide();
+}
+function addOpening(p,type){
+  const w=hitWall(p);if(!w){toast('Clique sobre uma parede');return}
+  const L=Math.hypot(w.x2-w.x1,w.y2-w.y1),ux=(w.x2-w.x1)/L,uy=(w.y2-w.y1)/L,t=(p.x-w.x1)*ux+(p.y-w.y1)*uy;
+  const ow=Math.min(type==='door'?.9:1.2,L*.9),s0=clamp(t-ow/2,0,L-ow),mat=type==='door'?'madeira':'vidro';
+  const at=d=>({x:w.x1+ux*d,y:w.y1+uy*d}),parts=[];
+  if(s0>.02)parts.push([0,s0,w.m]);const oi=parts.length;parts.push([s0,s0+ow,mat]);if(L-(s0+ow)>.02)parts.push([s0+ow,L,w.m]);
+  pushUndo();
+  const nw=parts.map(([a,b,m])=>({id:uid(),x1:at(a).x,y1:at(a).y,x2:at(b).x,y2:at(b).y,m}));
+  S.walls.splice(S.walls.indexOf(w),1,...nw);SEL={t:'w',id:nw[oi].id};dirty();renderSide();
+}
+function roomByMeasures(wd,hd,name){
+  const cx=(CW/2-V.ox)/V.s,cy=(CH/2-V.oy)/V.s,x0=r05(cx-wd/2),y0=r05(cy-hd/2),x1=x0+wd,y1=y0+hd;
+  pushUndo();const ids=new Set(),ls=new Set();
+  [[x0,y0,x1,y0],[x1,y0,x1,y1],[x1,y1,x0,y1],[x0,y1,x0,y0]].forEach(a=>{const w={id:uid(),x1:a[0],y1:a[1],x2:a[2],y2:a[3],m:MAT_SEL};S.walls.push(w);ids.add(w.id)});
+  if(name){const l={id:uid(),x:(x0+x1)/2,y:(y0+y1)/2,t:name};S.labels.push(l);ls.add(l.id)}
+  SEL={t:'multi',w:ids,a:new Set(),p:new Set(),l:ls};dirty();renderSide();toast('Cômodo criado. Arraste para posicionar ou use as setas.');
+}
+function setTool(t){
+  TOOL=t;DR={start:null,cur:null,room:null,scale:null,marq:null,tape:null};$('#scalePop').hidden=true;stage.dataset.tool=t;
+  $$('#toolbar [data-tool]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tool===t)));
+  const msg={wall:'Material atual: '+MAT[MAT_SEL].n+'. Clique em cada ponto e dê duplo clique para terminar.',room:'Material atual: '+MAT[MAT_SEL].n+'. Arraste para desenhar o cômodo.',ap:'Clique na planta para posicionar '+DEV[ARMED].model,meas:'Clique no ponto onde você mediu o sinal',scale:'Clique em dois pontos de uma medida conhecida da imagem',door:'Clique sobre uma parede para abrir uma porta de 0,9 m',win:'Clique sobre uma parede para abrir uma janela de 1,2 m',label:'Clique para nomear um ambiente',tape:'Clique em dois pontos para medir a distância'}[t];
+  if(msg)toast(msg);
+  renderOverlay();
+}
+function onDown(e){
+  try{ov.setPointerCapture(e.pointerId)}catch(_){}
+  PTR.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(PTR.size===2){const [a,b]=[...PTR.values()];G={d:Math.hypot(a.x-b.x,a.y-b.y),s:V.s,ox:V.ox,oy:V.oy,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2};D=null;return}
+  const p=toWorld(e);
+  if(e.button===1||SPACE){D={k:'pan',sx:e.clientX,sy:e.clientY,ox:V.ox,oy:V.oy,moved:true};return}
+  if(e.button===2){if(DR.start){DR.start=null;renderOverlay()}return}
+  if(TOOL==='select'){
+    const ha=hitAp(p),hp=ha?null:hitPin(p),hl=(ha||hp)?null:hitLabel(p);
+    const hv=(ha||hp||hl)?null:hitVtx(p),hw=(ha||hp||hl||hv)?null:hitWall(p);
+    if(SEL&&SEL.t==='multi'){
+      const inM=(ha&&SEL.a.has(ha.id))||(hp&&SEL.p.has(hp.id))||(hl&&SEL.l.has(hl.id))||(hw&&SEL.w.has(hw.id));
+      if(inM){D={k:'group',last:{x:r05(p.x),y:r05(p.y)},moved:false};return}
+    }
+    if(ha){SEL={t:'ap',id:ha.id};D={k:'item',o:ha,dx:ha.x-p.x,dy:ha.y-p.y,moved:false}}
+    else if(hp){SEL={t:'pin',id:hp.id};D={k:'item',o:hp,dx:hp.x-p.x,dy:hp.y-p.y,moved:false}}
+    else if(hl){SEL={t:'l',id:hl.id};D={k:'item',o:hl,dx:hl.x-p.x,dy:hl.y-p.y,moved:false}}
+    else if(hv){const ends=gather(hv.x,hv.y);SEL={t:'w',id:ends[0].w.id};D={k:'vtx',ends,moved:false}}
+    else if(hw){SEL={t:'w',id:hw.id};D={k:'wall',ends:uniqEnds([...gather(hw.x1,hw.y1),...gather(hw.x2,hw.y2)]),last:{x:r05(p.x),y:r05(p.y)},moved:false}}
+    else if(e.shiftKey){SEL=null;DR.marq={a:{x:p.x,y:p.y},b:{x:p.x,y:p.y}};D={k:'marq'}}
+    else D={k:'pan',sx:e.clientX,sy:e.clientY,ox:V.ox,oy:V.oy,moved:false,clear:true};
+    renderInspector();renderOverlay();return;
+  }
+  if(TOOL==='wall'){
+    const sp=snapPt(p,DR.start);
+    if(!DR.start){DR.start=sp;DR.cur=sp}else{pushUndo();addWall(DR.start.x,DR.start.y,sp.x,sp.y,MAT_SEL);DR.start=sp;dirty()}
+    renderOverlay();return;
+  }
+  if(TOOL==='room'){const sp=snapPt(p);DR.room={a:sp,b:sp};D={k:'room'};return}
+  if(TOOL==='door'||TOOL==='win'){addOpening(p,TOOL);return}
+  if(TOOL==='label'){
+    pushUndo();const l={id:uid(),x:r05(p.x),y:r05(p.y),t:'Ambiente'};S.labels.push(l);SEL={t:'l',id:l.id};dirty();setTool('select');renderSide();
+    const inp=$('#lText');if(inp){inp.focus();inp.select()}return;
+  }
+  if(TOOL==='tape'){const sp=snapPt(p);if(!DR.tape||DR.tape.b)DR.tape={a:sp,b:null,cur:sp};else DR.tape.b=sp;renderOverlay();return}
+  if(TOOL==='ap'){
+    pushUndo();const sp={x:r05(p.x),y:r05(p.y)};
+    const ap={id:uid(),dev:ARMED,x:sp.x,y:sp.y,h:2.7,pw:0,name:'AP '+(S.aps.length+1)};S.aps.push(ap);SEL={t:'ap',id:ap.id};dirty();setTool('select');renderSide();return;
+  }
+  if(TOOL==='meas'){
+    pushUndo();const pin={id:uid(),x:r05(p.x),y:r05(p.y),name:'P'+(S.pins.length+1),band:S.band,rssi:null,down:null,up:null,ping:null};S.pins.push(pin);SEL={t:'pin',id:pin.id};dirty();setTool('select');renderSide();return;
+  }
+  if(TOOL==='scale'&&S.bg){
+    if(!DR.scale||DR.scale.b){DR.scale={a:{x:p.x,y:p.y},b:null}}else{DR.scale.b={x:p.x,y:p.y};if(Math.hypot(DR.scale.b.x-DR.scale.a.x,DR.scale.b.y-DR.scale.a.y)>.05){$('#scalePop').hidden=false;$('#scaleDist').focus()}else DR.scale=null}
+    renderOverlay();
+  }
+}
+function onMove(e){
+  const pt=PTR.get(e.pointerId);if(pt){pt.x=e.clientX;pt.y=e.clientY}
+  if(G&&PTR.size===2){const [a,b]=[...PTR.values()];const d=Math.hypot(a.x-b.x,a.y-b.y),r=ov.getBoundingClientRect();const f=clamp(G.s*d/G.d,ZMIN,ZMAX)/G.s;const cx=G.cx-r.left,cy=G.cy-r.top;V.s=G.s*f;V.ox=cx-(cx-G.ox)*f;V.oy=cy-(cy-G.oy)*f;scheduleRender();return}
+  const p=toWorld(e);
+  if(D){
+    if(D.k==='pan'){const dx=e.clientX-D.sx,dy=e.clientY-D.sy;if(Math.abs(dx)+Math.abs(dy)>3)D.moved=true;V.ox=D.ox+dx;V.oy=D.oy+dy;scheduleRender()}
+    else if(D.k==='item'){if(!D.moved){pushUndo();D.moved=true}D.o.x=r05(p.x+D.dx);D.o.y=r05(p.y+D.dy);heatDirty=true;SUG=null;scheduleRender()}
+    else if(D.k==='vtx'){if(!D.moved){pushUndo();D.moved=true}const t=snapPt(p,null,new Set(D.ends.map(x=>x.w.id+x.k)));D.ends.forEach(x=>{x.w['x'+x.k]=t.x;x.w['y'+x.k]=t.y});heatDirty=true;SUG=null;scheduleRender()}
+    else if(D.k==='wall'||D.k==='group'){
+      const q={x:r05(p.x),y:r05(p.y)},dx=q.x-D.last.x,dy=q.y-D.last.y;
+      if(dx||dy){if(!D.moved){pushUndo();D.moved=true}D.k==='wall'?shiftEnds(D.ends,dx,dy):translateSel(dx,dy);D.last=q;heatDirty=true;SUG=null;scheduleRender()}
+    }
+    else if(D.k==='room'){DR.room.b=snapPt(p);renderOverlay()}
+    else if(D.k==='marq'){DR.marq.b={x:p.x,y:p.y};renderOverlay()}
+    return;
+  }
+  if(TOOL==='wall'&&DR.start){DR.cur=snapPt(p,DR.start);renderOverlay()}
+  if(TOOL==='scale'&&DR.scale&&!DR.scale.b){DR.scale.cur=p;renderOverlay()}
+  if(TOOL==='tape'&&DR.tape&&!DR.tape.b){DR.tape.cur=snapPt(p);renderOverlay()}
+  updateReadout(p);
+}
+function onUp(e){
+  PTR.delete(e.pointerId);if(PTR.size<2)G=null;
+  if(!D)return;
+  if(D.k==='room'){const a=DR.room.a,b=DR.room.b;DR.room=null;
+    if(Math.abs(b.x-a.x)>.4&&Math.abs(b.y-a.y)>.4){pushUndo();const x0=Math.min(a.x,b.x),x1=Math.max(a.x,b.x),y0=Math.min(a.y,b.y),y1=Math.max(a.y,b.y);
+      addWall(x0,y0,x1,y0,MAT_SEL);addWall(x1,y0,x1,y1,MAT_SEL);addWall(x1,y1,x0,y1,MAT_SEL);addWall(x0,y1,x0,y0,MAT_SEL);dirty()}
+    renderOverlay()}
+  else if(D.k==='marq'){
+    const a=DR.marq.a,b=DR.marq.b,x0=Math.min(a.x,b.x),x1=Math.max(a.x,b.x),y0=Math.min(a.y,b.y),y1=Math.max(a.y,b.y);DR.marq=null;
+    const inb=(x,y)=>x>=x0&&x<=x1&&y>=y0&&y<=y1,ids=L=>new Set(L.map(o=>o.id));
+    const ms={t:'multi',w:ids(S.walls.filter(w=>inb(w.x1,w.y1)&&inb(w.x2,w.y2))),a:ids(S.aps.filter(o=>inb(o.x,o.y))),p:ids(S.pins.filter(o=>inb(o.x,o.y))),l:ids(S.labels.filter(o=>inb(o.x,o.y)))};
+    SEL=(ms.w.size+ms.a.size+ms.p.size+ms.l.size)?ms:null;renderInspector();renderOverlay()}
+  else if(D.k==='pan'&&D.clear&&!D.moved){SEL=null;renderInspector();renderOverlay()}
+  else if(['item','vtx','wall','group'].includes(D.k)&&D.moved){dirty();renderSide()}
+  D=null;
+}
+function updateReadout(p){
+  const el=$('#readout');if(HEAT&&!HEAT.n){el.textContent='Nenhum AP com '+BANDS[S.band]+'. Adicione ou troque o equipamento.';return}
+  const r=predictAt(p.x,p.y,S.band,false);
+  if(r.r<=-120||!r.ap){el.textContent='Adicione um AP para simular o sinal';return}
+  const d=DEV[r.ap.dev],rate=Math.min(d.rate[S.band],CLIENT[S.band])*frac(r.r)*.55;
+  el.innerHTML=`${nf(r.r,0)} dBm · SNR ${nf(r.r-NOISE,0)} dB · ≈ ${nf(rate,0)} Mbps · ${esc(r.ap.name)}`;
+}
+function zoomAt(f,cx,cy){const ns=clamp(V.s*f,ZMIN,ZMAX),k=ns/V.s;V.ox=cx-(cx-V.ox)*k;V.oy=cy-(cy-V.oy)*k;V.s=ns;scheduleRender()}
+ov.addEventListener('pointerdown',onDown);ov.addEventListener('pointermove',onMove);ov.addEventListener('pointerup',onUp);ov.addEventListener('pointercancel',onUp);
+ov.addEventListener('pointerleave',()=>{if(!D)$('#readout').textContent='Passe o cursor pela planta para ver o sinal estimado'});
+ov.addEventListener('contextmenu',e=>e.preventDefault());
+ov.addEventListener('dblclick',()=>{if(TOOL==='wall'){DR.start=null;renderOverlay()}});
+ov.addEventListener('wheel',e=>{e.preventDefault();const r=ov.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.0016),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+$('#zIn').onclick=()=>zoomAt(1.3,CW/2,CH/2);$('#zOut').onclick=()=>zoomAt(1/1.3,CW/2,CH/2);$('#zFit').onclick=fit;
+$$('#toolbar [data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+$('#btnUndo').onclick=undo;
+$('#btnImg').onclick=()=>$('#fileImg').click();
+$('#fileImg').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{const img=new Image();img.onload=()=>{
+    pushUndo();if(S.sample){S.walls=[];S.aps=[];S.pins=[];S.labels=[];S.sample=false;S.meta.client='Nova vistoria';$('#projName').value=S.meta.client}
+    S.bg={img,w:img.naturalWidth,h:img.naturalHeight,scale:14/img.naturalWidth,x:0,y:0};
+    $('#btnScale').disabled=false;dirty();fit();toast('Planta carregada. Use Escala para calibrar com uma medida conhecida e trace as paredes por cima.');renderSide()};
+    img.onerror=()=>toast('Não foi possível ler essa imagem');img.src=rd.result};
+  rd.readAsDataURL(f);e.target.value='';
+});
+$('#scaleOk').onclick=()=>{
+  const v=+$('#scaleDist').value,sc=DR.scale;if(!sc||!sc.b||!(v>0))return;
+  const cur=Math.hypot(sc.b.x-sc.a.x,sc.b.y-sc.a.y),f=v/cur;
+  S.bg.x=sc.a.x-(sc.a.x-S.bg.x)*f;S.bg.y=sc.a.y-(sc.a.y-S.bg.y)*f;S.bg.scale*=f;
+  DR.scale=null;$('#scalePop').hidden=true;setTool('select');dirty();fit();toast('Escala aplicada');
+};
+$('#scaleNo').onclick=()=>{DR.scale=null;$('#scalePop').hidden=true;renderOverlay()};
+$('#bandSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.band=+b.dataset.band;heatDirty=true;SUG=null;scheduleRender();save()});
+$('#brandSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;BRAND=b.dataset.b;fillSelDev()});
+$('#selDev').addEventListener('change',e=>{ARMED=e.target.value;miniDev()});
+$('#btnPlace').onclick=()=>setTool('ap');
+$('#btnSuggest').onclick=()=>{
+  if(!S.walls.length){toast('Desenhe as paredes antes de pedir uma sugestão');return}
+  const s=suggest();if(!s||s.gain<.5){SUG=null;$('#sugBox').innerHTML='<p class="hint">A cobertura já está boa neste ponto de vista. Nenhum local acrescenta área relevante.</p>';renderOverlay();return}
+  SUG=s;$('#sugBox').innerHTML=`<p class="hint" style="color:var(--fg)">Melhor local para ${esc(DEV[ARMED].model)}: x ${nf(s.x,1)} m, y ${nf(s.y,1)} m. Acrescenta cerca de <b>${nf(s.gain,0)} %</b> da área com sinal ≥ −67 dBm.</p><div class="btnrow" style="margin-top:6px"><button class="btn primary" id="sugApply" type="button">Posicionar aqui</button></div>`;
+  $('#sugApply').onclick=()=>{pushUndo();const ap={id:uid(),dev:ARMED,x:s.x,y:s.y,h:2.7,pw:0,name:'AP '+(S.aps.length+1)};S.aps.push(ap);SEL={t:'ap',id:ap.id};dirty();renderSide()};
+  renderOverlay();
+};
+$('#mats').addEventListener('click',e=>{const b=e.target.closest('[data-mat]');if(!b)return;MAT_SEL=b.dataset.mat;const o=selObj();if(o&&SEL.t==='w'){pushUndo();o.m=MAT_SEL;dirty();renderInspector()}renderMats()});
+let nudgeT=0;
+$('#cInsp').addEventListener('input',e=>{
+  const o=selObj();if(!o)return;const id=e.target.id;
+  if(id==='apH'){o.h=+e.target.value;$('#apHv').textContent=nf(o.h,1)+' m';heatDirty=true;scheduleRender();save()}
+  if(id==='apP'){o.pw=+e.target.value;$('#apPv').textContent=o.pw+' dB';const d=DEV[o.dev];$('#apE').textContent='EIRP efetiva: '+d.eirp.map((v,i)=>d.rate[i]>0?BANDS[i]+' '+nf(v+o.pw,1):'').filter(Boolean).join(' · ')+' dBm';heatDirty=true;scheduleRender();save()}
+  if(id==='apName'||id==='pName'){o.name=e.target.value;renderOverlay();save()}
+  if(id==='lText'){o.t=e.target.value||' ';renderOverlay();save()}
+});
+$('#cInsp').addEventListener('change',e=>{
+  const o=selObj();if(!o)return;const id=e.target.id,v=e.target.value;
+  if(id==='apDev'){pushUndo();o.dev=v;dirty();renderInspector()}
+  if(id==='wMat'){pushUndo();o.m=v;dirty();renderInspector()}
+  if(id==='wLen')setWallLen(o,+v);
+  if(id==='pBand'){o.band=+v;dirty();renderInspector()}
+  const num=x=>x===''?null:+x;
+  if(id==='pRssi'){o.rssi=num(v);dirty();renderInspector()}
+  if(id==='pDown'){o.down=num(v);save()} if(id==='pUp'){o.up=num(v);save()} if(id==='pPing'){o.ping=num(v);save()}
+});
+function sideClick(e){
+  const a=e.target.closest('[data-act]'),pi=e.target.closest('[data-pin]');
+  if(pi){SEL={t:'pin',id:pi.dataset.pin};renderInspector();renderOverlay();return}
+  if(!a)return;const o=selObj(),act=a.dataset.act;
+  if(act==='del')delSel();
+  if(act==='dup'&&o){pushUndo();const c={...o,id:uid(),x:o.x+1,y:o.y+1,name:o.name+' (cópia)'};S.aps.push(c);SEL={t:'ap',id:c.id};dirty();renderSide()}
+  if(act==='split'&&o)splitWall(o);
+  if(act==='calib'){pushUndo();S.calib=+a.dataset.v;dirty();renderSide();toast('Modelo ajustado em '+nf(S.calib,1)+' dB')}
+  if(act==='calibReset'){pushUndo();S.calib=0;dirty();renderSide()}
+}
+$('#cInsp').addEventListener('click',sideClick);$('#cMeas').addEventListener('click',sideClick);
+$('#btnRoom').onclick=()=>{const w=+$('#rmW').value,h=+$('#rmH').value;if(!(w>=.5&&h>=.5)){toast('Informe largura e comprimento em metros');return}roomByMeasures(w,h,$('#rmName').value.trim())};
+$('#btnDims').onclick=()=>{S.dims=!S.dims;$('#btnDims').setAttribute('aria-pressed',String(S.dims));renderOverlay();save()};
+document.addEventListener('keydown',e=>{
+  const t=e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT')return;
+  if(e.code==='Space'){SPACE=true;return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();return}
+  if($('#v-planta').hidden)return;
+  const k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==='a'){e.preventDefault();const ids=L=>new Set(L.map(o=>o.id));SEL={t:'multi',w:ids(S.walls),a:ids(S.aps),p:ids(S.pins),l:ids(S.labels)};renderInspector();renderOverlay();return}
+  if(e.ctrlKey||e.metaKey)return;
+  const map={v:'select',w:'wall',r:'room',a:'ap',m:'meas',d:'door',j:'win',t:'label',k:'tape'};
+  if(map[k]){setTool(map[k]);return}
+  if(k==='e'&&S.bg){setTool('scale');return}
+  if(k==='c'){$('#btnDims').click();return}
+  if(k==='escape'){DR={start:null,cur:null,room:null,scale:null,marq:null,tape:null};SEL=null;SUG=null;$('#scalePop').hidden=true;setTool('select');renderInspector();return}
+  if((k==='delete'||k==='backspace')&&SEL){e.preventDefault();delSel();return}
+  if(k.startsWith('arrow')&&SEL){
+    e.preventDefault();const st=e.shiftKey?.5:.05;
+    const dx=k==='arrowleft'?-st:k==='arrowright'?st:0,dy=k==='arrowup'?-st:k==='arrowdown'?st:0;
+    if(!nudgeT)pushUndo();clearTimeout(nudgeT);nudgeT=setTimeout(()=>{nudgeT=0},700);
+    translateSel(dx,dy);scheduleRender();save();renderInspector();
+  }
+});
+document.addEventListener('keyup',e=>{if(e.code==='Space')SPACE=false});
+
+/* ---------- equipamentos ---------- */
+let BRAND2='all';
+function renderDevs(){
+  $('#devGrid').innerHTML=CATALOG.filter(d=>BRAND2==='all'||d.b===BRAND2).map(d=>`
+   <article class="card dev">
+    <div class="hd"><div><div class="muted" style="font-size:12px;font-weight:700;color:${BRANDS[d.b].c}">${BRANDS[d.b].n} ${BRANDS[d.b].line}</div><h4>${esc(d.model)}</h4></div><span class="tag">${d.std}${d.tag?' · '+d.tag:''}</span></div>
+    <div class="dev-fig">${deviceSvg(d,.5,true)}</div>
+    ${d.est?'<div class="tags"><span class="tag est">Potência por banda estimada</span></div>':''}
+    <dl class="spec">
+     <dt>Taxa máx. (2,4 / 5 / 6)</dt><dd>${rateTxt(d)} Mbps</dd>
+     <dt>EIRP (2,4 / 5 / 6)</dt><dd>${eirpTxt(d)} dBm</dd>
+     <dt>Ganho da antena</dt><dd>${d.gain.map((v,i)=>d.rate[i]>0?nf(v,1):'—').join(' / ')} dBi</dd>
+     <dt>Uplink</dt><dd>${d.ul}</dd>
+     <dt>PoE</dt><dd>${d.poe||'n/c'}${d.w?' · '+nf(d.w,1)+' W':''}</dd>
+     <dt>Dimensões</dt><dd>${d.shape==='round'?'⌀'+nf(d.dim[0],0):nf(d.dim[0],d.dim[0]%1?1:0)+' × '+nf(d.dim[1],d.dim[1]%1?1:0)} × ${nf(d.dim[2],1)} mm</dd>
+     <dt>Peso</dt><dd>${d.wt?nf(d.wt,0)+' g':'n/c'}</dd>
+     <dt>Montagem</dt><dd>${d.mount}</dd>
+     <dt>Cobertura (fabricante)</dt><dd>${d.cov?'até '+d.cov+' m²':'n/c'}</dd>
+     <dt>Clientes</dt><dd>${d.cli||'n/c'}</dd>
+    </dl>
+    <div class="src"><a href="${d.url}" target="_blank" rel="noopener">Ficha do fabricante ↗</a><button class="btn primary" data-use="${d.id}" type="button">Usar na planta</button></div>
+   </article>`).join('');
+}
+$('#brandSeg2').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;BRAND2=b.dataset.b;$$('#brandSeg2 button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderDevs()});
+$('#devGrid').addEventListener('click',e=>{const b=e.target.closest('[data-use]');if(!b)return;ARMED=b.dataset.use;BRAND='all';fillSelDev();location.hash='planta';setTool('ap')});
+
+/* ---------- teste de banda ---------- */
+const T={running:false,ctrl:null,last:null,samples:[]};
+const GC=2*Math.PI*84,GARC=GC*.75;
+function setGauge(v){
+  const steps=[50,100,250,500,1000,2500,10000];let mx=steps.find(s=>s>=v*1.1)||steps[steps.length-1];
+  const f=clamp(v/mx,0,1);
+  $('#gTr').setAttribute('stroke-dasharray',`${GARC} ${GC}`);$('#gTr').setAttribute('transform','rotate(135 120 110)');
+  $('#gVl').setAttribute('stroke-dasharray',`${GARC*f} ${GC}`);$('#gVl').setAttribute('transform','rotate(135 120 110)');
+  $('#gNum').textContent=nf(v,v<10?1:0);$('#gMax').textContent='escala até '+nf(mx,0)+' Mbps';
+}
+function setSpark(){
+  const s=T.samples;if(s.length<2){$('#sparkLn').setAttribute('points','');return}
+  const mx=Math.max(...s,1);$('#sparkLn').setAttribute('points',s.map((v,i)=>`${(i/(s.length-1))*300},${60-(v/mx)*54}`).join(' '));
+}
+async function runTest(){
+  if(T.running){T.ctrl&&T.ctrl.abort();return}
+  T.running=true;T.samples=[];setSpark();setGauge(0);
+  $('#btnTestTxt').textContent='Parar';$('#mDown').textContent='—';$('#mPing').textContent='—';$('#mJit').textContent='—';
+  const st=$('#testStatus');st.textContent='Medindo latência…';
+  const ctrl=new AbortController();T.ctrl=ctrl;
+  try{
+    const pings=[];
+    for(let i=0;i<8;i++){const t=performance.now();const r=await fetch('speed/ping.txt?'+Math.random(),{cache:'no-store',signal:ctrl.signal});await r.text();pings.push(performance.now()-t)}
+    const sorted=[...pings].sort((a,b)=>a-b),ping=sorted[Math.floor(sorted.length/2)];
+    let jit=0;for(let i=1;i<pings.length;i++)jit+=Math.abs(pings[i]-pings[i-1]);jit/=pings.length-1;
+    $('#mPing').textContent=nf(ping,0);$('#mJit').textContent=nf(jit,1);
+    st.textContent='Medindo download…';
+    let bytes=0;const t0=performance.now(),dur=8000,hist=[[t0,0]];
+    const stopAt=setTimeout(()=>ctrl.abort(),dur);
+    const workers=[0,1,2,3].map(async()=>{
+      while(!ctrl.signal.aborted){
+        const r=await fetch('speed/blob.wav?'+Math.random(),{cache:'no-store',signal:ctrl.signal});
+        if(r.body&&r.body.getReader){const rd=r.body.getReader();for(;;){const {done,value}=await rd.read();if(done)break;bytes+=value.length}}
+        else{const b=await r.arrayBuffer();bytes+=b.byteLength}
+      }
+    });
+    const tick=setInterval(()=>{
+      const now=performance.now();hist.push([now,bytes]);
+      const ref=hist.find(h=>now-h[0]<=1000)||hist[0];const dt=(now-ref[0])/1000;
+      const mbps=dt>0?(bytes-ref[1])*8/dt/1e6:0;T.samples.push(mbps);setGauge(mbps);setSpark();
+    },250);
+    await Promise.allSettled(workers);clearTimeout(stopAt);clearInterval(tick);
+    const el=(performance.now()-t0)/1000;
+    const skip=T.samples.slice(Math.floor(T.samples.length*.2));const avg=skip.length?skip.reduce((a,b)=>a+b,0)/skip.length:bytes*8/el/1e6;
+    setGauge(avg);$('#mDown').textContent=nf(avg,avg<10?1:0);
+    T.last={down:Math.round(avg),ping:Math.round(ping),jit};
+    st.textContent=ctrl.signal.aborted&&el<dur/1000-.5?'Teste interrompido':'Concluído';
+  }catch(err){
+    if(ctrl.signal.aborted)st.textContent='Teste interrompido';
+    else st.textContent='Não foi possível acessar o arquivo de teste. Use um dos testes completos.';
+  }
+  T.running=false;$('#btnTestTxt').textContent='Iniciar teste';renderLog();
+}
+$('#btnTest').onclick=runTest;
+function renderLog(){
+  const el=$('#cLog');let h='<h3>Salvar resultado no mapa</h3>';
+  if(!S.pins.length){el.innerHTML=h+'<div class="empty">Crie um ponto de medição na planta (ferramenta Medição) para guardar os resultados de cada ambiente.</div>';return}
+  const L=T.last||{};
+  h+=`<div class="field"><label for="lgPin">Ponto</label><select id="lgPin">${S.pins.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
+  <div class="row2"><div class="field"><label for="lgDown">Download (Mbps)</label><input id="lgDown" type="number" min="0" value="${L.down??''}"></div><div class="field"><label for="lgUp">Upload (Mbps)</label><input id="lgUp" type="number" min="0"></div></div>
+  <div class="field"><label for="lgPing">Latência (ms)</label><input id="lgPing" type="number" min="0" value="${L.ping??''}"></div>
+  <div class="btnrow"><button class="btn primary" id="lgSave" type="button">Salvar no ponto</button></div>
+  <div class="scroll-x" style="margin-top:12px"><table class="tbl"><thead><tr><th>Ponto</th><th>Sinal</th><th>Down</th><th>Up</th><th>Ping</th></tr></thead><tbody>${S.pins.map(p=>`<tr><td>${esc(p.name)}</td><td class="num">${p.rssi!=null?p.rssi+' dBm':'—'}</td><td class="num">${p.down??'—'}</td><td class="num">${p.up??'—'}</td><td class="num">${p.ping??'—'}</td></tr>`).join('')}</tbody></table></div>`;
+  el.innerHTML=h;
+  $('#lgSave').onclick=()=>{const p=S.pins.find(x=>x.id===$('#lgPin').value);if(!p)return;const n=id=>{const v=$(id).value;return v===''?null:+v};
+    pushUndo();p.down=n('#lgDown')??p.down;p.up=n('#lgUp')??p.up;p.ping=n('#lgPing')??p.ping;save();renderLog();$('#testStatus').textContent='Salvo em '+p.name};
+}
+
+/* ---------- relatório ---------- */
+function coverageFor(bi){
+  buildWalls();const b=bounds(),aps=S.aps.filter(a=>DEV[a.dev].rate[bi]>0);if(!aps.length)return null;
+  let tot=0,g=0,k=0;for(let y=b.y0+.25;y<b.y1;y+=.5)for(let x=b.x0+.25;x<b.x1;x+=.5){tot++;const r=predictAt(x,y,bi,false).r;if(r>=-67)g++;if(r>=-72)k++}
+  return {good:Math.round(100*g/tot),ok:Math.round(100*k/tot)};
+}
+function reportText(){
+  const m=S.meta,c5=coverageFor(1),c24=coverageFor(0);let t=`VISTORIA TÉCNICA DE WI-FI\nCliente: ${m.client}\nLocal: ${m.addr||'—'} (${m.type})\nTécnico: ${m.tech||'—'} · Data: ${m.date}\n\n`;
+  t+=`Equipamentos propostos (${S.aps.length}):\n`+S.aps.map(a=>{const d=DEV[a.dev];return `- ${a.name}: ${BRANDS[d.b].n} ${d.model} em x ${nf(a.x,1)} m, y ${nf(a.y,1)} m, altura ${nf(a.h,1)} m`}).join('\n');
+  t+=`\n\nCobertura prevista (sinal ≥ −67 dBm): 2,4 GHz ${c24?c24.good+'%':'—'} · 5 GHz ${c5?c5.good+'%':'—'}\n`;
+  if(S.pins.length)t+=`\nMedições:\n`+S.pins.map(p=>`- ${p.name} (${BANDS[p.band]}): ${p.rssi!=null?p.rssi+' dBm':'—'} · down ${p.down??'—'} Mbps · up ${p.up??'—'} Mbps · ping ${p.ping??'—'} ms`).join('\n');
+  t+=rkReportText();
+  t+=`\n\nObservação: estimativa baseada em modelo de propagação, sujeita a validação após a instalação.`;return t;
+}
+function renderReport(){
+  const m=S.meta,c5=coverageFor(1),c24=coverageFor(0);let watts=0;S.aps.forEach(a=>watts+=DEV[a.dev].w||0);
+  const recs=[];
+  if(!S.aps.length)recs.push('Posicione ao menos um AP na planta para gerar a previsão.');
+  if(c5&&c5.good<90)recs.push(`A cobertura em 5 GHz é de ${c5.good}% da área. Use “Sugerir local” na planta para encontrar onde um AP extra tem mais efeito.`);
+  if(c5&&c5.good>=90)recs.push(`Cobertura prevista em 5 GHz de ${c5.good}%. Valide com medições reais nos cômodos mais distantes.`);
+  const mp=S.pins.filter(p=>p.rssi!=null);
+  if(mp.length){let s=0,n=0;for(const p of mp){const r=predictAt(p.x,p.y,p.band,false).r;if(r>-120){s+=p.rssi-r;n++}}if(n){const a=s/n;recs.push(Math.abs(a)<=3?`As medições conferem com a previsão (diferença média ${nf(a,1)} dB).`:`As medições diferem da previsão em média ${nf(a,1)} dB. Use “Ajustar modelo” na planta.`)}}
+  else recs.push('Ainda não há medições reais. Marque pontos na planta e informe o sinal para validar o modelo.');
+  if(S.aps.length>1)recs.push('Defina canais diferentes em APs vizinhos (2,4 GHz: 1, 6 e 11) e use largura de 20/40 MHz em ambientes densos.');
+  $('#rep').innerHTML=`
+   <div class="rep-top">
+    <div class="card"><h3>Mapa de sinal · 5 GHz</h3><canvas class="snap" id="snap" width="1440" height="840"></canvas></div>
+    <div class="card"><h3>Dados da vistoria</h3>
+      <div class="field" style="margin-top:0"><label for="rCli">Cliente</label><input id="rCli" type="text" value="${esc(m.client)}"></div>
+      <div class="field"><label for="rAddr">Endereço</label><input id="rAddr" type="text" value="${esc(m.addr)}"></div>
+      <div class="row2"><div class="field"><label for="rType">Tipo</label><select id="rType">${['Residência','Empresa','Loja','Escritório','Clínica'].map(t=>`<option${t===m.type?' selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label for="rDate">Data</label><input id="rDate" type="text" value="${esc(m.date)}"></div></div>
+      <div class="field"><label for="rTech">Técnico responsável</label><input id="rTech" type="text" value="${esc(m.tech)}"></div>
+    </div>
+   </div>
+   <div class="kpis">
+    <div class="kpi"><small>Cobertura 5 GHz (≥ −67 dBm)</small><b>${c5?c5.good+'%':'—'}</b></div>
+    <div class="kpi"><small>Cobertura 2,4 GHz (≥ −67 dBm)</small><b>${c24?c24.good+'%':'—'}</b></div>
+    <div class="kpi"><small>APs</small><b>${S.aps.length}</b></div>
+    <div class="kpi"><small>PoE total</small><b>${nf(watts,1)} W</b></div>
+   </div>
+   <div class="card"><h3>Equipamentos</h3>${S.aps.length?`<div class="scroll-x"><table class="tbl"><thead><tr><th>Nome</th><th>Marca e modelo</th><th>Padrão</th><th>Posição (m)</th><th>Altura</th><th>PoE</th><th>Dimensões</th></tr></thead><tbody>${S.aps.map(a=>{const d=DEV[a.dev];return `<tr><td>${esc(a.name)}</td><td>${BRANDS[d.b].n} ${esc(d.model)}</td><td>${d.std}</td><td class="num">${nf(a.x,1)} ; ${nf(a.y,1)}</td><td class="num">${nf(a.h,1)} m</td><td class="num">${d.w?nf(d.w,1)+' W':'n/c'}</td><td class="num">${d.shape==='round'?'⌀'+d.dim[0]:d.dim[0]+'×'+d.dim[1]} mm</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">Nenhum equipamento na planta.</div>'}</div>
+   ${rkReportHtml()}
+   <div class="card"><h3>Medições</h3>${S.pins.length?`<div class="scroll-x"><table class="tbl"><thead><tr><th>Ponto</th><th>Banda</th><th>Medido</th><th>Previsto</th><th>Diferença</th><th>Down</th><th>Up</th><th>Ping</th></tr></thead><tbody>${S.pins.map(p=>{const r=predictAt(p.x,p.y,p.band,false).r,dl=p.rssi!=null&&r>-120?p.rssi-r:null;return `<tr><td>${esc(p.name)}</td><td>${BANDS[p.band]}</td><td class="num">${p.rssi!=null?p.rssi+' dBm':'—'}</td><td class="num">${r>-120?nf(r,0)+' dBm':'—'}</td><td class="num">${dl!=null?(dl>0?'+':'')+nf(dl,0)+' dB':'—'}</td><td class="num">${p.down??'—'}</td><td class="num">${p.up??'—'}</td><td class="num">${p.ping??'—'}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">Sem pontos de medição.</div>'}</div>
+   <div class="card"><h3>Recomendações</h3><ul class="recs">${recs.map(r=>`<li>${esc(r)}</li>`).join('')}</ul><p class="note">Previsão feita com modelo de propagação em ambiente interno. Móveis, espelhos e interferência de vizinhos alteram o resultado real, por isso valide após a instalação.</p></div>`;
+  [['#rCli','client'],['#rAddr','addr'],['#rTech','tech'],['#rDate','date']].forEach(([s,k])=>$(s).addEventListener('input',e=>{S.meta[k]=e.target.value;if(k==='client')$('#projName').value=e.target.value;save()}));
+  $('#rType').addEventListener('change',e=>{S.meta.type=e.target.value;save()});
+  const sn=$('#snap'),c=sn.getContext('2d');const bi=S.band;const saveBand=S.band;
+  S.band=1;computeHeat();const hv=HEAT;const f=fitView(720,420,bounds(),30);c.setTransform(2,0,0,2,0,0);drawScene(c,720,420,f,true);
+  S.band=saveBand;heatDirty=true;scheduleRender();
+}
+$('#btnCopy').onclick=async()=>{
+  const t=reportText();
+  try{await navigator.clipboard.writeText(t);$('#btnCopy').lastChild.textContent='Copiado'}catch(e){
+    const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');$('#btnCopy').lastChild.textContent='Copiado'}catch(_){$('#btnCopy').lastChild.textContent='Selecione e copie manualmente'}ta.remove();
+  }
+  setTimeout(()=>{$('#btnCopy').lastChild.textContent='Copiar resumo'},2200);
+};
+
+/* ---------- rack e rede ---------- */
+const NB={tp:{n:'TP-Link',c:'#2aa7a1'},ub:{n:'Ubiquiti',c:'#3d7be0'},zy:{n:'Zyxel',c:'#e0873a'},mt:{n:'MikroTik',c:'#6b7a99'},gn:{n:'Genérico',c:'#8b8f84'}};
+const CATN={router:'Roteador',unmanaged:'Switch não gerenciável',managed:'Switch gerenciável',poe:'Switch PoE',acc:'Acessório'};
+const UMM=44.45, RACKW=482.6;
+const ZYDS='https://static.us.zyxel.com/pdf/2024/switch/ds_GS1900-24HPv2.pdf';
+/* dim = [largura, profundidade, altura] em mm. rj = portas RJ45, sfp = portas SFP/SFP+/SFP28. poeN/poeW = portas e orçamento PoE. w = consumo máximo (W). */
+const NET=[
+ {id:'mt-rb5009',b:'mt',model:'RB5009UG+S+IN',cat:'router',form:'desk',u:1,dim:[220,125,22],rj:8,sfp:1,w:25,os:'RouterOS v7, licença 5',url:'https://mikrotik.com/product/rb5009ug_s_in',note:'7× GbE + 1× 2,5 GbE + 1× SFP+. Tamanho de mesa, kit de rack K-79 opcional (4 por 1U).'},
+ {id:'mt-rb4011',b:'mt',model:'RB4011iGS+RM',cat:'router',form:'rack',u:1,dim:[228,120,30],rj:10,sfp:1,w:33,os:'RouterOS v7, licença 5',url:'https://mikrotik.com/product/rb4011igs_rm',note:'10× GbE + 1× SFP+. Orelhas de rack inclusas para 1U. PoE passivo de saída na Ether10.'},
+ {id:'mt-ccr2004',b:'mt',model:'CCR2004-1G-12S+2XS',cat:'router',form:'rack',u:1,dim:[443,224,44],rj:1,sfp:14,w:60,os:'RouterOS v7, licença 6',url:'https://mikrotik.com/product/ccr2004_1g_12s_2xs',note:'1× GbE + 12× SFP+ + 2× SFP28. A ficha não cita o U, a altura de 44 mm equivale a 1U.',infer:true},
+ {id:'mt-hex',b:'mt',model:'RB750Gr3 (hEX)',cat:'router',form:'desk',u:1,dim:[113,89,28],rj:5,sfp:0,w:10,os:'RouterOS, licença 4',url:'https://mikrotik.com/product/RB750Gr3',note:'5× GbE. Tamanho de mesa. Entrada PoE passiva de 8 a 30 V.'},
+ {id:'tp-er605',b:'tp',model:'ER605 v2',cat:'router',form:'desk',u:1,dim:[158,101,25],rj:5,sfp:0,w:7.94,os:'Omada SDN',url:'https://static.tp-link.com/upload/product-overview/2023/202309/20230911/ER605(UN)2.0_Datasheet.pdf',note:'1× WAN, 2× LAN/WAN, 2× LAN. Tamanho de mesa. NAT de 1.808 Mbps bidirecional.'},
+ {id:'tp-er7206',b:'tp',model:'ER7206 v2',cat:'router',form:'desk',u:1,dim:[226,131,35],rj:5,sfp:1,w:7.5,os:'Omada SDN',url:'https://static.tp-link.com/upload/product-overview/2024/202402/20240205/ER7206(UN)2.0_Datasheet.pdf',note:'5× GbE + 1× SFP. A ficha informa desktop ou parede, sem citar rack.'},
+ {id:'zy-flex100',b:'zy',model:'USG FLEX 100',cat:'router',form:'desk',u:1,dim:[216,147.3,33],rj:5,sfp:0,w:12.5,wt:.85,os:'Firewall Zyxel',url:'https://www.zyxel.com/us/en-us/products/firewall-ngfw/usg-flex-100/license-and-spec',note:'Firewall com 900 Mbps de throughput SPI. Segundo a ficha não é montável em rack.'},
+ {id:'tp-sg1016d',b:'tp',model:'TL-SG1016D',cat:'unmanaged',form:'rack',u:1,dim:[294,180,44],rj:16,sfp:0,w:9.95,sw:32,os:'Sem gerenciamento',url:'https://www.tp-link.com/us/business-networking/unmanaged-switch/tl-sg1016d/',note:'Largura de 13 pol. (294 mm) com kit de rack incluso. A ficha não cita o U, a altura de 44 mm equivale a 1U.',infer:true},
+ {id:'zy-gs1900-8',b:'zy',model:'GS1900-8',cat:'managed',form:'desk',u:1,dim:[250,104,27],rj:8,sfp:0,w:5,sw:16,wt:.65,os:'Smart managed',url:ZYDS,note:'Desktop com kit de parede.'},
+ {id:'zy-gs1900-24',b:'zy',model:'GS1900-24',cat:'managed',form:'rack',u:1,dim:[440,131,44],rj:24,sfp:2,w:17.1,sw:52,wt:2.09,os:'Smart managed',url:ZYDS,note:'Kit de rack incluso. A ficha não cita o U, a altura de 44 mm equivale a 1U.',infer:true},
+ {id:'mt-crs326',b:'mt',model:'CRS326-24G-2S+RM',cat:'managed',form:'rack',u:1,dim:[443,144,44],rj:24,sfp:2,w:24,os:'RouterOS ou SwOS',url:'https://mikrotik.com/product/CRS326-24G-2SplusRM',note:'24× GbE + 2× SFP+. Rackmount de 1U.'},
+ {id:'zy-gs1900-8hp',b:'zy',model:'GS1900-8HP',cat:'poe',mgmt:true,form:'desk',u:1,dim:[250,104,27],rj:8,sfp:0,poeN:8,poeW:77,poeStd:'802.3at',w:84.8,sw:16,wt:.71,os:'Smart managed',url:ZYDS,note:'8 portas PoE+, orçamento de 77 W. Desktop com kit de parede.'},
+ {id:'zy-gs1900-24hp',b:'zy',model:'GS1900-24HPv2',cat:'poe',mgmt:true,form:'rack',u:1,dim:[441,270,44],rj:24,sfp:2,poeN:24,poeW:170,poeStd:'802.3at',w:206.5,sw:52,wt:3.55,os:'Smart managed',url:ZYDS,note:'24 portas PoE+, orçamento de 170 W. A ficha não cita o U, a altura de 44 mm equivale a 1U.',infer:true},
+ {id:'tp-sg2428p',b:'tp',model:'SG2428P',cat:'poe',mgmt:true,form:'rack',u:1,dim:[440,220,44],rj:24,sfp:4,poeN:24,poeW:250,poeStd:'802.3af/at',w:289.8,sw:56,wt:3.2,os:'Omada SDN',url:'https://static.tp-link.com/upload/product-overview/2026/202602/20260211/SG2428P(UN)5.40_datasheet.pdf',note:'24× GbE PoE+ (até 30 W por porta) + 4× SFP. A ficha não cita o U, a altura de 44 mm equivale a 1U.',infer:true},
+ {id:'mt-crs328',b:'mt',model:'CRS328-24P-4S+RM',cat:'poe',mgmt:true,form:'rack',u:1,dim:[443,300,44],rj:24,sfp:4,poeN:24,poeW:450,poeStd:'802.3af/at',w:494,os:'RouterOS ou SwOS',url:'https://mikrotik.com/product/crs328_24p_4s_rm',note:'24× GbE PoE (até 30 W por porta) + 4× SFP+. 450 W garantidos para PoE. Rackmount de 1U.'},
+ {id:'ub-usw-pro-24-poe',b:'ub',model:'USW-Pro-24-PoE',cat:'poe',mgmt:true,form:'rack',u:1,dim:[442,285,44],rj:24,sfp:2,poeN:24,poeW:400,poeStd:'PoE+ (16) e PoE++ (8)',w:450,sw:88,wt:4.3,os:'UniFi Network',url:'https://techspecs.ui.com/unifi/switching/usw-pro-24-poe?subcategory=all-switching',note:'24× GbE (16 PoE+ e 8 PoE++) + 2× SFP+. Rack 1U.'},
+ {id:'ub-usw-lite-8-poe',b:'ub',model:'USW-Lite-8-PoE',cat:'poe',mgmt:true,form:'desk',u:1,dim:[99.6,163.7,31.7],rj:8,sfp:0,poeN:4,poeW:52,poeStd:'PoE+',w:60,sw:16,wt:.295,os:'UniFi Network',url:'https://techspecs.ui.com/unifi/switching/usw-lite-8-poe',note:'8× GbE, 4 com PoE+, orçamento de 52 W. Desktop compacto ou parede. A página lista uma porta GbE adicional.'},
+ {id:'g-patch24',b:'gn',model:'Patch panel 24 portas',cat:'acc',form:'rack',u:1,dim:[RACKW,null,UMM],rj:24,sfp:0,generic:true,note:'Padrão EIA-310, 19 pol., 1U. A profundidade varia por fabricante.'},
+ {id:'g-org',b:'gn',model:'Organizador de cabos 1U',cat:'acc',form:'rack',u:1,dim:[RACKW,null,UMM],rj:0,sfp:0,generic:true,note:'Padrão EIA-310, 19 pol., 1U.'},
+ {id:'g-shelf',b:'gn',model:'Bandeja fixa 1U',cat:'acc',form:'rack',u:1,dim:[RACKW,null,UMM],rj:0,sfp:0,generic:true,note:'Para equipamentos de mesa. Padrão EIA-310, 1U.'},
+ {id:'g-pdu',b:'gn',model:'Régua de tomadas 1U',cat:'acc',form:'rack',u:1,dim:[RACKW,null,UMM],rj:0,sfp:0,generic:true,note:'Padrão EIA-310, 19 pol., 1U.'},
+ {id:'g-dio',b:'gn',model:'DIO 1U (fibra óptica)',cat:'acc',form:'rack',u:1,dim:[RACKW,null,UMM],rj:0,sfp:0,generic:true,note:'Distribuidor interno óptico, padrão EIA-310, 1U.'},
+ {id:'g-ups2u',b:'gn',model:'Nobreak de rack 2U',cat:'acc',form:'rack',u:2,dim:[RACKW,null,UMM*2],rj:0,sfp:0,generic:true,note:'Altura de 2U. Consumo e autonomia dependem do modelo, informe pelo equipamento personalizado.'}
+];
+const getNet=id=>NET.find(d=>d.id===id)||((S.rack&&S.rack.custom)||[]).find(d=>d.id===id)||null;
+const blankRack=()=>({u:12,depth:600,items:[],custom:[],link:{},apLink:{}});
+function sampleRack(a1,a2){
+  const p=uid(),o1=uid(),r=uid(),s=uid(),o2=uid();
+  return {u:12,depth:600,custom:[],items:[{id:p,dev:'g-patch24',u:12,name:'Patch panel'},{id:o1,dev:'g-org',u:11,name:''},{id:r,dev:'mt-rb4011',u:10,name:'Roteador'},{id:s,dev:'zy-gs1900-24hp',u:9,name:'Switch PoE'},{id:o2,dev:'g-org',u:8,name:''}],link:{[s]:r},apLink:{[a1]:s,[a2]:s}};
+}
+const RK={sel:null,cat:'all',brand:'all',view:'rack',ghost:null,drag:null,dragDev:null,c:null,geo:null,msgT:0};
+const portTxt=d=>[d.rj?d.rj+'× RJ45':'',d.sfp?d.sfp+'× SFP':'',d.poeN?'PoE '+d.poeN+' portas · '+nf(d.poeW,0)+' W':''].filter(Boolean).join(' · ');
+function rkMsg(t){const el=$('#rkMsg');el.textContent=t;el.hidden=false;clearTimeout(RK.msgT);RK.msgT=setTimeout(()=>{el.hidden=true},4200)}
+function rkFree(start,h,ignore){
+  const R=S.rack;if(start<1||start+h-1>R.u)return false;
+  for(const it of R.items){if(it.id===ignore)continue;const d=getNet(it.dev);if(!d)continue;if(start<=it.u+d.u-1&&start+h-1>=it.u)return false}
+  return true;
+}
+function rkPlace(devId,u){pushUndo();const it={id:uid(),dev:devId,u,name:''};const nd=getNet(devId);if(nd&&nd.cat!=='acc'&&nd.cat!=='router'){const r=S.rack.items.find(x=>{const q=getNet(x.dev);return q&&q.cat==='router'});if(r)S.rack.link[it.id]=r.id}S.rack.items.push(it);RK.sel=it.id;rkUpdate()}
+function rkAddFirstFree(devId){
+  const d=getNet(devId);if(!d)return;
+  for(let s=S.rack.u-d.u+1;s>=1;s--){if(rkFree(s,d.u)){rkPlace(devId,s);return}}
+  rkMsg('Não há '+d.u+'U livre neste rack. Aumente a altura do rack ou remova um equipamento.');
+}
+function rkRemove(id){
+  pushUndo();const R=S.rack;R.items=R.items.filter(i=>i.id!==id);
+  delete R.link[id];Object.keys(R.link).forEach(k=>{if(R.link[k]===id)delete R.link[k]});
+  Object.keys(R.apLink).forEach(k=>{if(R.apLink[k]===id)delete R.apLink[k]});
+  if(RK.sel===id)RK.sel=null;rkUpdate();
+}
+function rkDescendants(id,kids){const out=new Set(),st=[id];while(st.length){const x=st.pop();(kids[x]||[]).forEach(o=>{if(!out.has(o.it.id)){out.add(o.it.id);st.push(o.it.id)}})}return out}
+function rkCalc(){
+  const R=S.rack,items=R.items.map(it=>({it,d:getNet(it.dev)})).filter(o=>o.d);
+  const byId=Object.fromEntries(items.map(o=>[o.it.id,o]));
+  const apsAt={};S.aps.forEach(a=>{const t=R.apLink[a.id];if(t&&byId[t])(apsAt[t]=apsAt[t]||[]).push(a)});
+  const kids={};items.forEach(o=>{const p=R.link[o.it.id];if(p&&byId[p])(kids[p]=kids[p]||[]).push(o)});
+  const alerts=[],add=(lv,t,id)=>alerts.push({lv,t,id});
+  const hasRouter=items.some(x=>x.d.cat==='router');
+  let used=0,wTot=0,kg=0,kgN=0,poeB=0,poeL=0,portsU=0,portsT=0;const stat={};
+  for(const o of items){
+    const {it,d}=o,net=d.cat!=='acc',nm=it.name||d.model;
+    used+=d.u;wTot+=d.w||0;if(d.wt){kg+=d.wt;kgN++}
+    const child=(kids[it.id]||[]).length,apl=apsAt[it.id]||[],parent=R.link[it.id]&&byId[R.link[it.id]];
+    const total=(d.rj||0)+(d.sfp||0);
+    const usedP=net?(d.cat==='router'?1:(parent?1:0))+child+apl.length:0;
+    const load=apl.reduce((s,a)=>s+(DEV[a.dev].w||0),0);
+    stat[it.id]={used:usedP,total,load,apN:apl.length,child};
+    if(net){portsU+=usedP;portsT+=total;if(d.poeW){poeB+=d.poeW;poeL+=load}}
+    if(net&&usedP>total)add('bad',nm+': '+usedP+' conexões para '+total+' portas.',it.id);
+    if(d.poeW&&load>d.poeW)add('bad',nm+': carga PoE de '+nf(load,1)+' W passa do orçamento de '+nf(d.poeW,0)+' W.',it.id);
+    if(d.poeN&&apl.length>d.poeN)add('bad',nm+': '+apl.length+' APs para '+d.poeN+' portas PoE.',it.id);
+    if(apl.length&&!d.poeW)add('warn',nm+' não fornece PoE. Os APs ligados nele precisam de injetor PoE.',it.id);
+    if(d.dim[1]&&d.dim[1]>R.depth-80)add('warn',nm+': profundidade de '+nf(d.dim[1],0)+' mm deixa menos de 80 mm de folga para cabos no rack de '+R.depth+' mm.',it.id);
+    if(net&&d.cat!=='router'&&!parent&&hasRouter)add('warn',nm+' sem uplink definido.',it.id);
+  }
+  S.aps.forEach(a=>{if(!(R.apLink[a.id]&&byId[R.apLink[a.id]]))add('warn',a.name+' ('+DEV[a.dev].model+') ainda não está ligado a um switch.')});
+  if(used>0&&used/R.u>.8)add('info','Rack com '+Math.round(100*used/R.u)+'% ocupado. Deixe cerca de 20% livre para crescer.');
+  return {items,byId,kids,apsAt,stat,alerts,used,wTot,kg,kgN,poeB,poeL,portsU,portsT};
+}
+function rkUpdate(){save();rkDraw();rkSide()}
+function renderRack(){if($('#v-rack').hidden)return;rkPalette();rkDraw();rkSide()}
+
+/* paleta */
+function rkPalette(){
+  const R=S.rack,list=NET.concat(R.custom||[]).filter(d=>(RK.cat==='all'||d.cat===RK.cat)&&(RK.brand==='all'||d.b===RK.brand));
+  $('#rkCat').value=RK.cat;$('#rkBrand').value=RK.brand;
+  $('#rkList').innerHTML=list.length?list.map(d=>`<div class="rk-item" draggable="true" data-dev="${d.id}" title="Arraste para o rack ou use o botão +">
+    <div><b>${esc(d.model)}</b><div class="muted" style="font-size:11.5px"><span style="color:${NB[d.b].c};font-weight:700">${NB[d.b].n}</span> · ${CATN[d.cat]}${d.mgmt?' gerenciável':''}</div></div>
+    <span style="display:flex;gap:6px">${d.custom?`<button class="btn mini" data-cdel="${d.id}" type="button" aria-label="Remover ${esc(d.model)} da lista">${ic('trash')}</button>`:''}<button class="btn mini" data-add="${d.id}" type="button" aria-label="Adicionar ${esc(d.model)} ao rack">+</button></span>
+    <div class="s">${d.u}U${d.form==='desk'?' (mesa, em bandeja)':''} · ${portTxt(d)||'sem portas'} · ${d.w!=null?nf(d.w,1)+' W':'consumo n/c'}</div></div>`).join(''):'<div class="empty">Nenhum equipamento neste filtro.</div>';
+}
+/* desenho do rack */
+function portCells(d,rightX,y,h,used,K){
+  const rj=d.rj||0,sf=d.sfp||0;if(!rj&&!sf)return '';
+  const rows=(rj>12||sf>6)?2:1,cols=Math.ceil(rj/rows),scols=Math.ceil(sf/rows),cw=12.5,sw=15,ch=rows===2?10.5:12,gh=rows*ch+(rows-1)*2.5;
+  const wp=cols*cw+(scols?8+scols*sw:0),x0=rightX-wp,y0=y+(h-gh)/2;let s='';
+  for(let i=0;i<rj;i++){const cx=x0+Math.floor(i/rows)*cw,cy=y0+(i%rows)*(ch+2.5),poe=i<(d.poeN||0),u=i<used;
+    s+=`<rect x="${cx}" y="${cy}" width="${cw-2}" height="${ch}" rx="1.5" fill="${u?'var(--ok)':poe?'var(--accent)':'var(--ctl)'}" fill-opacity="${u?.95:poe?.45:1}" stroke="${poe?'var(--accent-ink)':'var(--fg-3)'}" stroke-width=".8"/>`}
+  for(let i=0;i<sf;i++){const cx=x0+cols*cw+8+Math.floor(i/rows)*sw,cy=y0+(i%rows)*(ch+2.5),u=(rj+i)<used;
+    s+=`<rect x="${cx}" y="${cy}" width="${sw-2.5}" height="${ch}" rx="2" fill="${u?'var(--ok)':'var(--fg-3)'}" fill-opacity="${u?.95:.5}" stroke="var(--fg-3)" stroke-width=".8"/>`}
+  return s;
+}
+function trunc(t,n){t=String(t);return t.length>n?t.slice(0,Math.max(1,n-1))+'…':t}
+function rkGeo(){const R=S.rack,K=.9;return {K,UP:UMM*K,PW:RACKW*K,L:42,T:30,RW:(RACKW-450)/2*K,H:30+R.u*UMM*K+34,W:42+RACKW*K+84}}
+function rkDraw(){
+  const el=$('#rkStage'),R=S.rack,c=rkCalc();RK.c=c;
+  $$('#rkView button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rv===RK.view)));
+  if(RK.view==='topo'){el.innerHTML=rkTopo(c);return}
+  const g=rkGeo(),{K,UP,PW,L,T,RW,H,W}=g;RK.geo=g;
+  let h=`<svg class="rk" id="rkSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Rack de ${R.u}U"><defs><linearGradient id="rkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--dev-hi)"/><stop offset="1" style="stop-color:var(--dev-lo)"/></linearGradient></defs>`;
+  h+=`<rect x="${L-3}" y="${T-6}" width="${PW+6}" height="${R.u*UP+12}" rx="9" fill="var(--glass-2)" stroke="var(--line-strong)"/>`;
+  h+=`<rect x="${L}" y="${T}" width="${RW}" height="${R.u*UP}" fill="var(--ctl)"/><rect x="${L+PW-RW}" y="${T}" width="${RW}" height="${R.u*UP}" fill="var(--ctl)"/>`;
+  for(let u=1;u<=R.u;u++){
+    const y=T+(R.u-u)*UP;
+    h+=`<line x1="${L}" y1="${y}" x2="${L+PW}" y2="${y}" stroke="var(--line)"/>`;
+    h+=`<text x="${L-9}" y="${y+UP/2+4}" text-anchor="end" font-size="11" fill="var(--fg-2)" style="font-family:var(--font-mono)">${u}</text>`;
+    [6.35,22.225,38.1].forEach(m=>{const hy=y+UP-m*K;h+=`<circle cx="${L+RW/2}" cy="${hy}" r="2.1" fill="var(--bg)" stroke="var(--fg-3)" stroke-width=".7"/><circle cx="${L+PW-RW/2}" cy="${hy}" r="2.1" fill="var(--bg)" stroke="var(--fg-3)" stroke-width=".7"/>`});
+  }
+  h+=`<line x1="${L}" y1="${T+R.u*UP}" x2="${L+PW}" y2="${T+R.u*UP}" stroke="var(--line)"/>`;
+  for(const o of c.items){
+    const {it,d}=o,y=T+(R.u-(it.u-1)-d.u)*UP,ht=d.u*UP,st=c.stat[it.id],bad=c.alerts.some(a=>a.id===it.id&&a.lv==='bad'),warn=c.alerts.some(a=>a.id===it.id&&a.lv==='warn');
+    const sel=RK.sel===it.id,col=NB[d.b].c,nm=it.name||d.model;
+    h+=`<g data-it="${it.id}" style="cursor:grab">`;
+    if(d.form==='desk'){
+      const bw=Math.min(PW-2*RW-20,d.dim[0]*K),bh=Math.min(ht-10,d.dim[2]*K),bx=L+PW-RW-14-bw,by=y+ht-6-bh;
+      h+=`<rect x="${L+RW}" y="${y+ht-6}" width="${PW-2*RW}" height="5" rx="2" fill="var(--fg-3)" opacity=".55"/>`;
+      h+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="url(#rkg)" stroke="var(--line-strong)"/><rect x="${bx}" y="${by}" width="3.5" height="${bh}" fill="${col}"/>`;
+      const n=(d.rj||0)+(d.sfp||0),pw=Math.min(9,(bw-14)/Math.max(1,n));
+      for(let i=0;i<n;i++){const u=i<st.used,poe=i<(d.poeN||0);h+=`<rect x="${bx+9+i*pw}" y="${by+bh/2-3}" width="${Math.max(2,pw-1.5)}" height="6" rx="1" fill="${u?'var(--ok)':poe?'var(--accent)':'var(--ctl)'}" stroke="var(--fg-3)" stroke-width=".5"/>`}
+      h+=`<text x="${L+RW+8}" y="${y+16}" font-size="12" font-weight="700" fill="var(--fg)">${esc(trunc(nm,Math.floor((bx-L-RW-16)/6.8)))}</text><text x="${L+RW+8}" y="${y+30}" font-size="9.5" fill="var(--fg-2)" style="font-family:var(--font-mono)">${esc(trunc(it.name?d.model:'Mesa · bandeja',Math.floor((bx-L-RW-16)/5.6)))}</text>`;
+    }else{
+      h+=`<rect x="${L+1}" y="${y+1.5}" width="${PW-2}" height="${ht-3}" rx="3" fill="url(#rkg)" stroke="var(--line-strong)"/><rect x="${L+1}" y="${y+1.5}" width="4" height="${ht-3}" fill="${col}"/>`;
+      for(let k=0;k<d.u;k++){[6.35,22.225,38.1].forEach(m=>{const hy=y+ht-(k*UMM+m)*K;h+=`<circle cx="${L+RW/2}" cy="${hy}" r="2.1" fill="var(--bg)" stroke="var(--fg-3)" stroke-width=".7"/><circle cx="${L+PW-RW/2}" cy="${hy}" r="2.1" fill="var(--bg)" stroke="var(--fg-3)" stroke-width=".7"/>`})}
+      const rx=L+PW-RW-10,pc=portCells(d,rx,y,ht,st.used,K),wp=Math.ceil((d.rj||0)/(((d.rj||0)>12||(d.sfp||0)>6)?2:1))*12.5+((d.sfp||0)?8+Math.ceil((d.sfp||0)/(((d.rj||0)>12||(d.sfp||0)>6)?2:1))*15:0),room=Math.floor((rx-wp-(L+RW+12)-8)/6.6);
+      h+=pc;
+      h+=`<text x="${L+RW+12}" y="${y+Math.min(17,ht/2-2)}" font-size="12" font-weight="700" fill="var(--fg)">${esc(trunc(nm,Math.max(6,room)))}</text><text x="${L+RW+12}" y="${y+Math.min(31,ht/2+12)}" font-size="9.5" fill="var(--fg-2)" style="font-family:var(--font-mono)">${esc(trunc(it.name&&d.cat!=='acc'?d.model:(d.cat==='acc'?'':CATN[d.cat])+(d.poeW?' · '+nf(d.poeW,0)+' W PoE':''),Math.max(8,Math.floor(room*1.15))))}</text>`;
+    }
+    if(bad||warn)h+=`<g transform="translate(${L+PW-RW-2},${y+9})"><circle r="7" fill="${bad?'var(--bad)':'var(--warn)'}"/><text y="3.8" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">!</text></g>`;
+    if(sel)h+=`<rect x="${L-1}" y="${y}" width="${PW+2}" height="${ht}" rx="4" fill="none" stroke="var(--accent-ink)" stroke-width="2.5" stroke-dasharray="6 4"/>`;
+    h+=`</g>`;
+  }
+  h+=`<rect id="rkGhost" x="${L}" y="0" width="${PW}" height="${UP}" rx="4" fill="var(--ok)" fill-opacity=".25" stroke="var(--ok)" stroke-width="2" stroke-dasharray="5 4" visibility="hidden" pointer-events="none"/>`;
+  const dx=L+PW+18;
+  h+=`<path d="M${dx-5} ${T}H${dx}V${T+R.u*UP}H${dx-5}" fill="none" stroke="var(--fg-2)" stroke-width="1.4"/><text transform="translate(${dx+16},${T+R.u*UP/2}) rotate(90)" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--fg-2)" style="font-family:var(--font-mono)">${R.u}U = ${nf(R.u*UMM,0)} mm de altura útil</text>`;
+  h+=`<text x="${L}" y="${H-10}" font-size="11" fill="var(--fg-3)" style="font-family:var(--font-mono)">1U = 44,45 mm · largura 19 pol. = 482,6 mm · U1 na base</text></svg>`;
+  el.innerHTML=h;rkBind();
+}
+function rkBind(){
+  const svg=$('#rkSvg');if(!svg)return;
+  svg.addEventListener('pointerdown',e=>{
+    const gEl=e.target.closest('[data-it]');
+    if(!gEl){if(RK.sel){RK.sel=null;rkDraw();rkSide()}return}
+    const id=gEl.dataset.it,it=S.rack.items.find(x=>x.id===id);if(!it)return;
+    const wasSel=RK.sel===id;RK.sel=id;RK.drag={id,u0:it.u,y0:e.clientY,moved:false,u:it.u,el:gEl};
+    try{svg.setPointerCapture(e.pointerId)}catch(_){}
+    if(!wasSel){svg.querySelectorAll('[data-it]').forEach(x=>{const r=x.querySelector('rect[stroke-dasharray="6 4"]');if(r)r.remove()});rkSide()}
+  });
+  svg.addEventListener('pointermove',e=>{
+    const D=RK.drag;if(!D)return;const it=S.rack.items.find(x=>x.id===D.id),d=getNet(it.dev),g=RK.geo;
+    const du=-Math.round((e.clientY-D.y0)/g.UP),u=D.u0+du;
+    if(du!==0||Math.abs(e.clientY-D.y0)>4)D.moved=true;
+    if(!D.moved)return;
+    D.u=u;D.el.setAttribute('transform',`translate(0,${-(u-D.u0)*g.UP})`);D.el.style.opacity='.85';
+    rkShowGhost(u,d.u,rkFree(u,d.u,D.id));
+  });
+  svg.addEventListener('pointerup',e=>{
+    const D=RK.drag;RK.drag=null;if(!D)return;
+    const it=S.rack.items.find(x=>x.id===D.id),d=getNet(it.dev);
+    if(D.moved&&D.u!==D.u0){if(rkFree(D.u,d.u,D.id)){pushUndo();it.u=D.u;rkUpdate();return}rkMsg('Esse espaço está ocupado ou fora do rack.')}
+    rkDraw();rkSide();
+  });
+}
+function rkShowGhost(start,h,ok){
+  const gh=$('#rkGhost'),g=RK.geo,R=S.rack;if(!gh||!g)return;
+  if(start<1||start+h-1>R.u){gh.setAttribute('visibility','hidden');return}
+  gh.setAttribute('y',g.T+(R.u-(start-1)-h)*g.UP);gh.setAttribute('height',h*g.UP);
+  gh.setAttribute('fill',ok?'var(--ok)':'var(--bad)');gh.setAttribute('stroke',ok?'var(--ok)':'var(--bad)');gh.setAttribute('visibility','visible');
+}
+function rkStartAt(clientY,d){
+  const svg=$('#rkSvg');if(!svg||!RK.geo)return 0;const r=svg.getBoundingClientRect(),g=RK.geo,R=S.rack;
+  const row=Math.floor((clientY-r.top-g.T)/g.UP),rowU=R.u-row;return rowU-(d.u-1);
+}
+/* topologia */
+function rkTopo(c){
+  const R=S.rack;if(!c.items.filter(o=>o.d.cat!=='acc').length)return '<div class="empty">Adicione roteadores e switches ao rack para ver a topologia.</div>';
+  const mk=(id,label,sub,sub2,color,kind,warn)=>({id,label,sub,sub2,color,kind,warn,kids:[]});
+  const net=mk('net','Internet','Operadora','','var(--fg-3)','net',false),map={},orph=mk('orph','Sem uplink','Ligue estes itens a um switch ou roteador','','var(--warn)','orph',false);
+  c.items.filter(o=>o.d.cat!=='acc').forEach(o=>{const st=c.stat[o.it.id],bad=c.alerts.some(a=>a.id===o.it.id&&a.lv==='bad');
+    map[o.it.id]=mk(o.it.id,o.it.name||o.d.model,(o.it.name?o.d.model+' · ':'')+NB[o.d.b].n,st.used+'/'+st.total+' portas'+(o.d.poeW?' · PoE '+nf(st.load,0)+'/'+nf(o.d.poeW,0)+' W':''),NB[o.d.b].c,'dev',bad)});
+  let hasOrph=false;
+  c.items.filter(o=>o.d.cat!=='acc').forEach(o=>{const p=R.link[o.it.id],n=map[o.it.id];
+    if(o.d.cat==='router')net.kids.push(n);else if(p&&map[p])map[p].kids.push(n);else{orph.kids.push(n);hasOrph=true}});
+  S.aps.forEach(a=>{const d=DEV[a.dev],t=R.apLink[a.id],n=mk('ap'+a.id,a.name,d.model+' · '+BRANDS[d.b].n,d.std+' · '+nf(d.w,1)+' W','var(--accent-ink)','ap',false);
+    n.color=BRANDS[d.b].c;if(t&&map[t])map[t].kids.push(n);else{orph.kids.push(n);hasOrph=true}});
+  const roots=[net].concat(hasOrph?[orph]:[]),NODES=[];let leaf=0,maxL=0;
+  const place=(n,l)=>{n.level=l;maxL=Math.max(maxL,l);if(!n.kids.length){n.y=leaf++}else{n.kids.forEach(k=>place(k,l+1));n.y=(n.kids[0].y+n.kids[n.kids.length-1].y)/2}NODES.push(n)};
+  roots.forEach(r=>place(r,0));
+  const NW=206,NH=54,GX=60,GY=16,W=24+(maxL+1)*(NW+GX),H=24+leaf*(NH+GY);
+  let h=`<svg class="rk" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Topologia da rede">`;
+  const X=n=>12+n.level*(NW+GX),Y=n=>12+n.y*(NH+GY);
+  for(const n of NODES)for(const k of n.kids){const x1=X(n)+NW,y1=Y(n)+NH/2,x2=X(k),y2=Y(k)+NH/2,mx=(x1+x2)/2;
+    h+=`<path d="M${x1} ${y1}C${mx} ${y1},${mx} ${y2},${x2} ${y2}" fill="none" stroke="${k.kind==='ap'?'var(--accent-ink)':n.kind==='orph'?'var(--warn)':'var(--fg-3)'}" stroke-width="${k.kind==='ap'?1.8:2.2}" ${n.kind==='orph'?'stroke-dasharray="5 4"':''}/>`}
+  for(const n of NODES){
+    const x=X(n),y=Y(n);
+    h+=`<g><rect x="${x}" y="${y}" width="${NW}" height="${NH}" rx="13" fill="var(--glass-2)" stroke="${n.warn?'var(--bad)':n.color}" stroke-width="${n.warn?2.6:1.8}"/><rect x="${x}" y="${y}" width="5" height="${NH}" rx="2" fill="${n.color}"/>`;
+    h+=`<text x="${x+16}" y="${y+19}" font-size="12.5" font-weight="700" fill="var(--fg)">${esc(trunc(n.label,26))}</text><text x="${x+16}" y="${y+33}" font-size="9.5" fill="var(--fg-2)">${esc(trunc(n.sub,38))}</text>`;
+    if(n.sub2)h+=`<text x="${x+16}" y="${y+46}" font-size="9.5" fill="var(--fg-2)" style="font-family:var(--font-mono)">${esc(trunc(n.sub2,36))}</text>`;
+    h+=`</g>`;
+  }
+  return h+'</svg>';
+}
+/* painel lateral */
+function rkSide(){
+  const R=S.rack,c=RK.c||rkCalc();
+  $('#rkU').value=String(R.u);$('#rkDepth').value=String(R.depth);$('#rkMm').textContent=nf(R.u*UMM,0)+' mm de altura útil';
+  const pct=Math.round(100*c.used/R.u),poePct=c.poeB?Math.min(100,Math.round(100*c.poeL/c.poeB)):0;
+  const bar=(p,bad)=>`<div style="height:7px;border-radius:5px;background:var(--line-strong);overflow:hidden;margin-top:6px"><div style="height:100%;width:${p}%;background:${bad?'var(--bad)':'var(--accent-ink)'}"></div></div>`;
+  $('#rkSum').innerHTML=`<h3>Resumo</h3><div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+   <div class="kpi"><small>Espaço (U)</small><b>${c.used}/${R.u}</b><span class="muted" style="font-size:12px"> ${R.u-c.used}U livres</span>${bar(pct,pct>100)}</div>
+   <div class="kpi"><small>Consumo máximo</small><b>${nf(c.wTot,0)} W</b><span class="muted" style="display:block;font-size:11.5px">soma dos máximos de ficha</span></div>
+   <div class="kpi"><small>PoE em uso</small><b>${c.poeB?nf(c.poeL,0)+' / '+nf(c.poeB,0)+' W':'—'}</b>${c.poeB?bar(poePct,c.poeL>c.poeB):''}</div>
+   <div class="kpi"><small>Portas</small><b>${c.portsU}/${c.portsT}</b><span class="muted" style="display:block;font-size:11.5px">em uso / total</span></div></div>
+   <p class="hint">${c.kgN?`Peso: pelo menos ${nf(c.kg,1)} kg (${c.kgN} de ${c.items.length} itens com peso informado).`:'Peso não informado nas fichas consultadas.'}</p>`;
+  const bads=c.alerts;
+  $('#rkAl').innerHTML=`<h3>Alertas</h3>${bads.length?`<ul class="recs" style="list-style:none;padding:0">${bads.map(a=>`<li style="display:grid;grid-template-columns:10px 1fr;gap:9px;font-size:12.5px;cursor:${a.id?'pointer':'default'}" ${a.id?`data-pick="${a.id}"`:''}><i style="width:9px;height:9px;border-radius:50%;margin-top:5px;background:${a.lv==='bad'?'var(--bad)':a.lv==='warn'?'var(--warn)':'var(--fg-3)'}"></i><span>${esc(a.t)}</span></li>`).join('')}</ul>`:'<p class="hint" style="margin:0">Sem alertas. Portas, PoE e profundidade estão dentro dos limites.</p>'}`;
+  /* inspetor */
+  const o=RK.sel&&c.byId[RK.sel];
+  if(!o){$('#rkInsp').innerHTML=`<h3>Equipamento</h3><p class="hint" style="margin:0">Clique num equipamento do rack para ver as especificações, mudar o nome, a posição e o uplink. Arraste para outro U. Arraste itens da lista da esquerda ou use o botão +.</p>`}
+  else{
+    const {it,d}=o,max=R.u-d.u+1,desc=rkDescendants(it.id,c.kids),canParent=c.items.filter(x=>x.d.cat!=='acc'&&x.it.id!==it.id&&!desc.has(x.it.id));
+    const net=d.cat!=='acc';
+    $('#rkInsp').innerHTML=`<h3>Equipamento selecionado</h3>
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:16px">${esc(d.model)}</b><span class="tag" style="color:${NB[d.b].c};border-color:${NB[d.b].c}">${NB[d.b].n}</span></div>
+    <div class="muted" style="font-size:12.5px">${CATN[d.cat]}${d.mgmt?' gerenciável':''}${d.generic?' · genérico':''}</div>
+    <div class="field"><label for="rkName">Nome ou função</label><input id="rkName" type="text" maxlength="30" value="${esc(it.name)}" placeholder="${esc(d.model)}"></div>
+    <div class="row2"><div class="field"><label for="rkPos">Posição (U inferior)</label><input id="rkPos" type="number" min="1" max="${max}" step="1" value="${it.u}"></div><div class="field"><span>Ocupa</span><b style="font-family:var(--font-mono);font-weight:500">${d.u}U · ${nf(d.u*UMM,2)} mm</b></div></div>
+    ${net?(d.cat==='router'?'<div class="field"><span>Uplink</span><b style="font-family:var(--font-ui)">Internet (WAN)</b></div>':`<div class="field"><label for="rkUp">Uplink (ligado em)</label><select id="rkUp"><option value="">Sem uplink</option>${canParent.map(x=>`<option value="${x.it.id}"${R.link[it.id]===x.it.id?' selected':''}>${esc(x.it.name||x.d.model)} (U${x.it.u})</option>`).join('')}</select></div>`):''}
+    <dl class="spec">
+     <dt>Dimensões</dt><dd>${d.dim[1]!=null?nf(d.dim[0],d.dim[0]%1?1:0)+' × '+nf(d.dim[1],d.dim[1]%1?1:0)+' × '+nf(d.dim[2],d.dim[2]%1?1:0)+' mm':nf(d.dim[0],1)+' × '+nf(d.dim[2],2)+' mm, prof. n/c'}</dd>
+     <dt>Portas</dt><dd>${portTxt(d)||'—'}</dd>
+     ${d.poeStd?`<dt>Padrão PoE</dt><dd>${d.poeStd}</dd>`:''}
+     <dt>Consumo máx.</dt><dd>${d.w!=null?nf(d.w,1)+' W':'n/c'}</dd>
+     ${d.sw?`<dt>Comutação</dt><dd>${d.sw} Gbps</dd>`:''}
+     <dt>Peso</dt><dd>${d.wt?nf(d.wt,2)+' kg':'n/c'}</dd>
+     ${d.os?`<dt>Sistema</dt><dd>${esc(d.os)}</dd>`:''}
+     ${net?`<dt>Portas em uso</dt><dd>${c.stat[it.id].used}/${c.stat[it.id].total}</dd>`:''}
+    </dl>
+    ${d.note?`<p class="hint">${esc(d.note)}${d.form==='desk'?' Este item é de mesa e ocupa 1U em uma bandeja no rack.':''}</p>`:''}
+    <div class="btnrow"><button class="btn" data-ract="up" type="button">Subir 1U</button><button class="btn" data-ract="down" type="button">Descer 1U</button><button class="btn danger" data-ract="del" type="button">${ic('trash')}Remover</button></div>
+    ${d.url?`<div class="src"><a href="${d.url}" target="_blank" rel="noopener">Ficha do fabricante ↗</a></div>`:''}`;
+  }
+  /* APs */
+  const sws=c.items.filter(x=>x.d.cat!=='acc'&&x.d.cat!=='router');
+  $('#rkAps').innerHTML=`<h3>Pontos de acesso do mapa</h3>`+(S.aps.length?S.aps.map(a=>{const d=DEV[a.dev];return `<div class="field" style="margin-top:8px"><label for="ap_${a.id}"><span>${esc(a.name)} <span class="muted" style="font-weight:500">${esc(d.model)}</span></span><b>${nf(d.w,1)} W</b></label><select id="ap_${a.id}" data-aplink="${a.id}"><option value="">Sem switch</option>${sws.map(x=>`<option value="${x.it.id}"${R.apLink[a.id]===x.it.id?' selected':''}>${esc(x.it.name||x.d.model)} (U${x.it.u})${x.d.poeW?'':' · sem PoE'}</option>`).join('')}</select></div>`}).join('')+`<div class="btnrow"><button class="btn" id="rkAuto" type="button">Distribuir automaticamente</button></div>`:'<p class="hint" style="margin:0">Posicione APs na aba Planta e sinal. Eles aparecem aqui para ligar nos switches.</p>');
+  const lst=$('#rkAuto');if(lst)lst.onclick=rkAutoAp;
+}
+function rkAutoAp(){
+  const R=S.rack,c=rkCalc(),sws=c.items.filter(x=>x.d.cat!=='acc'&&x.d.cat!=='router');
+  if(!sws.length){rkMsg('Adicione um switch ao rack primeiro.');return}
+  pushUndo();const load={},cnt={};
+  sws.forEach(x=>{load[x.it.id]=0;cnt[x.it.id]=0});
+  S.aps.forEach(a=>{const t=R.apLink[a.id];if(t&&load[t]!==undefined){load[t]+=DEV[a.dev].w||0;cnt[t]++}});
+  S.aps.forEach(a=>{if(R.apLink[a.id]&&load[R.apLink[a.id]]!==undefined)return;
+    const w=DEV[a.dev].w||0;
+    const ok=sws.filter(x=>x.d.poeW&&load[x.it.id]+w<=x.d.poeW&&cnt[x.it.id]<(x.d.poeN||0)).sort((p,q)=>(q.d.poeW-load[q.it.id])-(p.d.poeW-load[p.it.id]));
+    const pick=ok[0]||sws.find(x=>x.d.poeW)||sws[0];R.apLink[a.id]=pick.it.id;load[pick.it.id]+=w;cnt[pick.it.id]++});
+  rkUpdate();
+}
+/* eventos */
+function rkInit(){
+  $('#rkCat').onchange=e=>{RK.cat=e.target.value;rkPalette()};
+  $('#rkBrand').onchange=e=>{RK.brand=e.target.value;rkPalette()};
+  $('#rkView').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;RK.view=b.dataset.rv;rkDraw()});
+  $('#rkList').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(b){rkAddFirstFree(b.dataset.add);return}const x=e.target.closest('[data-cdel]');if(x){S.rack.custom=S.rack.custom.filter(d=>d.id!==x.dataset.cdel);rkUpdate();rkPalette()}});
+  $('#rkList').addEventListener('dragstart',e=>{const it=e.target.closest('[data-dev]');if(!it)return;RK.dragDev=it.dataset.dev;e.dataTransfer.setData('text/plain',RK.dragDev);e.dataTransfer.effectAllowed='copy'});
+  $('#rkList').addEventListener('dragend',()=>{RK.dragDev=null;rkShowGhost(0,1,false)});
+  const st=$('#rkStage');
+  st.addEventListener('dragover',e=>{if(!RK.dragDev)return;e.preventDefault();const d=getNet(RK.dragDev),s=rkStartAt(e.clientY,d);rkShowGhost(s,d.u,rkFree(s,d.u))});
+  st.addEventListener('drop',e=>{if(!RK.dragDev)return;e.preventDefault();const id=RK.dragDev,d=getNet(id),s=rkStartAt(e.clientY,d);RK.dragDev=null;if(rkFree(s,d.u))rkPlace(id,s);else{rkShowGhost(0,1,false);rkMsg('Esse espaço está ocupado ou fora do rack.')}});
+  $('#rkU').onchange=e=>{const n=+e.target.value,R=S.rack;let top=0;R.items.forEach(it=>{const d=getNet(it.dev);if(d)top=Math.max(top,it.u+d.u-1)});if(n<top){rkMsg('Há equipamentos até o U'+top+'. Mova ou remova antes de reduzir o rack.');e.target.value=String(R.u);return}pushUndo();R.u=n;rkUpdate()};
+  $('#rkDepth').onchange=e=>{pushUndo();S.rack.depth=+e.target.value;rkUpdate()};
+  let clr=0;$('#rkClear').onclick=()=>{const b=$('#rkClear');if(!clr){b.textContent='Confirmar: esvaziar rack?';clr=setTimeout(()=>{clr=0;b.textContent='Esvaziar rack'},3500);return}clearTimeout(clr);clr=0;b.textContent='Esvaziar rack';pushUndo();S.rack.items=[];S.rack.link={};S.rack.apLink={};RK.sel=null;rkUpdate()};
+  $('#rkAl').addEventListener('click',e=>{const li=e.target.closest('[data-pick]');if(li){RK.sel=li.dataset.pick;rkDraw();rkSide()}});
+  $('#rkInsp').addEventListener('change',e=>{const R=S.rack,it=R.items.find(x=>x.id===RK.sel);if(!it)return;const d=getNet(it.dev),id=e.target.id;
+    if(id==='rkName'){it.name=e.target.value.trim();rkUpdate()}
+    if(id==='rkPos'){const u=Math.round(+e.target.value);if(rkFree(u,d.u,it.id)){pushUndo();it.u=u;rkUpdate()}else{rkMsg('Esse espaço está ocupado ou fora do rack.');rkSide()}}
+    if(id==='rkUp'){pushUndo();if(e.target.value)R.link[it.id]=e.target.value;else delete R.link[it.id];rkUpdate()}});
+  $('#rkInsp').addEventListener('click',e=>{const b=e.target.closest('[data-ract]');if(!b)return;const R=S.rack,it=R.items.find(x=>x.id===RK.sel);if(!it)return;const d=getNet(it.dev);
+    if(b.dataset.ract==='del'){rkRemove(it.id);return}
+    const n=it.u+(b.dataset.ract==='up'?1:-1);if(rkFree(n,d.u,it.id)){pushUndo();it.u=n;rkUpdate()}else rkMsg('Esse espaço está ocupado ou fora do rack.')});
+  $('#rkAps').addEventListener('change',e=>{const id=e.target.dataset.aplink;if(!id)return;pushUndo();if(e.target.value)S.rack.apLink[id]=e.target.value;else delete S.rack.apLink[id];rkUpdate()});
+  $('#rkCustomForm').addEventListener('submit',e=>{e.preventDefault();
+    const v=id=>$(id).value,n=id=>Math.max(0,+v(id)||0),name=v('#cuName').trim();if(!name){rkMsg('Informe o nome do equipamento.');return}
+    const u=clamp(Math.round(+v('#cuU')||1),1,6),full=v('#cuW')==='19',poeW=n('#cuPoeW'),poeN=Math.min(n('#cuPoeN'),n('#cuRj'));
+    const cat=v('#cuCat'),dev={id:'c'+uid(),b:'gn',model:name,cat,mgmt:cat==='poe'||cat==='managed',form:full?'rack':'desk',u,dim:[full?RACKW:Math.max(60,n('#cuWd')||250),n('#cuD')||null,u*UMM],rj:n('#cuRj'),sfp:n('#cuSfp'),poeN:poeW?poeN||n('#cuRj'):0,poeW:poeW||undefined,poeStd:poeW?'informado pelo usuário':undefined,w:v('#cuWatt')===''?null:n('#cuWatt'),custom:true,generic:true,note:'Equipamento personalizado, valores informados por você.'};
+    pushUndo();S.rack.custom.push(dev);rkUpdate();rkPalette();e.target.reset();$('#rkCustom').open=false;rkMsg(name+' foi adicionado à lista.');
+  });
+  document.addEventListener('keydown',e=>{
+    if($('#v-rack').hidden||!RK.sel)return;const t=e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT')return;
+    if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();rkRemove(RK.sel)}
+  });
+}
+function rkReportHtml(){
+  const R=S.rack;if(!R.items.length)return '';const c=rkCalc();
+  const nm=o=>o.it.name||o.d.model,rows=c.items.slice().sort((a,b)=>b.it.u-a.it.u).map(o=>{const st=c.stat[o.it.id],p=R.link[o.it.id]&&c.byId[R.link[o.it.id]];
+    return `<tr><td class="num">U${o.d.u>1?o.it.u+'–'+(o.it.u+o.d.u-1):o.it.u}</td><td>${esc(nm(o))}${o.it.name?` <span class="muted">${esc(o.d.model)}</span>`:''}</td><td>${NB[o.d.b].n}</td><td>${CATN[o.d.cat]}</td><td class="num">${o.d.cat==='acc'?'—':st.used+'/'+st.total}</td><td class="num">${o.d.poeW?nf(st.load,0)+'/'+nf(o.d.poeW,0)+' W':'—'}</td><td>${o.d.cat==='router'?'Internet':p?esc(nm(p)):'—'}</td></tr>`}).join('');
+  return `<div class="card"><h3>Rack e rede</h3><div class="kpis" style="margin-bottom:12px"><div class="kpi"><small>Rack</small><b>${R.u}U</b></div><div class="kpi"><small>Espaço usado</small><b>${c.used}/${R.u}U</b></div><div class="kpi"><small>Consumo máx.</small><b>${nf(c.wTot,0)} W</b></div><div class="kpi"><small>PoE</small><b>${c.poeB?nf(c.poeL,0)+'/'+nf(c.poeB,0)+' W':'—'}</b></div></div><div class="scroll-x"><table class="tbl"><thead><tr><th>U</th><th>Equipamento</th><th>Marca</th><th>Tipo</th><th>Portas</th><th>PoE</th><th>Uplink</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function rkReportText(){
+  const R=S.rack;if(!R.items.length)return '';const c=rkCalc();
+  return `\n\nRack de ${R.u}U (profundidade ${R.depth} mm), ${c.used}U ocupados, consumo máximo ${nf(c.wTot,0)} W:\n`+c.items.slice().sort((a,b)=>b.it.u-a.it.u).map(o=>`- U${o.it.u}: ${o.it.name||o.d.model}${o.it.name?' ('+o.d.model+')':''}, ${NB[o.d.b].n}, ${CATN[o.d.cat]}`).join('\n');
+}
+rkInit();
+
+/* ---------- abas, tema, projeto ---------- */
+const TABS=['planta','equipamentos','rack','banda','relatorio'];
+function showTab(){
+  let t=(location.hash||'').replace('#','');if(!TABS.includes(t))t='planta';
+  TABS.forEach(n=>{$('#v-'+n).hidden=n!==t});
+  $$('.rail [data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===t)));
+  if(t==='planta'){requestAnimationFrame(()=>{resize();})}
+  if(t==='equipamentos')renderDevs();
+  if(t==='rack')renderRack();
+  if(t==='banda'){setGauge(T.last?T.last.down:0);renderLog()}
+  if(t==='relatorio')renderReport();
+}
+$$('.rail [data-tab]').forEach(b=>b.addEventListener('click',()=>{location.hash=b.dataset.tab}));
+window.addEventListener('hashchange',showTab);
+function applyTheme(t){
+  if(t)document.documentElement.setAttribute('data-theme',t);
+  const dark=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  $('#btnTheme').innerHTML=ic(dark?'sun':'moon');readColors();scheduleRender();
+}
+$('#btnTheme').onclick=()=>{
+  const cur=document.documentElement.getAttribute('data-theme'),dark=cur?cur==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  const n=dark?'light':'dark';applyTheme(n);try{localStorage.setItem('ondas-theme',n)}catch(e){}
+};
+$('#projName').addEventListener('input',e=>{S.meta.client=e.target.value;save()});
+let newT=0;
+$('#btnNew').onclick=()=>{
+  if(!newT){$('#btnNewTxt').textContent='Confirmar: limpar tudo?';newT=setTimeout(()=>{newT=0;$('#btnNewTxt').textContent='Nova vistoria'},3500);return}
+  clearTimeout(newT);newT=0;$('#btnNewTxt').textContent='Nova vistoria';
+  S=blankState();SEL=null;UNDO=[];SUG=null;$('#projName').value=S.meta.client;$('#btnScale').disabled=true;setTool('select');dirty();fitted=false;fit();renderSide();RK.sel=null;toast('Vistoria nova. Use Planta para subir uma imagem ou desenhe com Cômodo e Parede.');
+};
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>applyTheme(document.documentElement.getAttribute('data-theme')));
+
+/* ---------- início ---------- */
+(function init(){
+  const hr=new Date().getHours();$('#greet').textContent=(hr<12?'Bom dia':hr<18?'Boa tarde':'Boa noite')+', vistoria técnica de Wi-Fi';
+  S=load()||sampleState();$('#projName').value=S.meta.client||'';
+  let th=null;try{th=localStorage.getItem('ondas-theme')}catch(e){}
+  applyTheme(th);
+  fillSelDev();renderMats();renderSide();updateExChip();
+  new ResizeObserver(()=>{if(!$('#v-planta').hidden)resize()}).observe(stage);
+  showTab();resize();
+  setGauge(0);
+})();
+})();
+</script>
